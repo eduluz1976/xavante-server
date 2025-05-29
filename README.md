@@ -1,0 +1,96 @@
+
+# 🚀 PHP Native Workflow Engine
+
+A lightweight, open-source workflow engine to automate business processes using **native PHP**. Built on top of the **Slim Framework**, leveraging **MongoDB** for storage and **Redis** for queueing. Fully containerized with Docker for easy development and deployment.
+
+![Xavante Workflow Engine](docs/img/xavante.png)
+
+## ✨ Features
+
+- 🛠 Native PHP 8.2 implementation
+- 📦 RESTful API powered by [Slim Framework](https://www.slimframework.com/)
+- 🗃 Workflow persistence using MongoDB
+- ⚙ Job and task queuing via Redis
+- 🐳 Dockerized environment
+- 🔁 Supports asynchronous process execution
+
+
+## 🧱 Tech Stack
+
+| Component   | Tech                        |
+|------------|-----------------------------|
+| Language    | PHP 8.2                     |
+| Framework   | Slim Framework              |
+| Database    | MongoDB                     |
+| Queue       | Redis                       |
+| Containerization | Docker, Docker Compose |
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Docker & Docker Compose installed
+
+### Clone and Run
+
+```bash
+git clone https://github.com/eduluz1976/xavante-server.git
+cd xavante-server
+cp .env.example .env
+docker-compose up --build
+````
+
+The API will be available at: [http://localhost:8080](http://localhost:8080)
+
+### API Example
+
+```http
+POST /api/v1/workflows/{workflow_id}/start 
+```
+
+
+
+## 🐳 Docker Overview
+
+* **PHP App**: Runs the API using Slim
+* **MongoDB**: Persists workflow definitions and execution states
+* **Redis**: Handles async job queues
+* **Queue Worker**: Background process consuming and executing queued steps
+
+## ⚙ Environment Variables
+
+All environment configuration is managed via `.env` file.
+
+```env
+APP_EXTERNAL_PORT=8080
+MONGO_DATABASE=xavante
+MONGO_HOST=db
+MONGO_PORT=27017
+MONGO_USERNAME=xavante_user
+MONGO_PASSWORD=mySup3rS3cretPassword
+MONGO_AUTH_SOURCE=admin
+DB_UI_EXTERNAL_PORT=<port for my db client - dev env only>
+REDIS_UI_EXTERNAL_PORT=<port for my redis client - dev env only>
+```
+
+## 📜 License
+
+Apache 2.0 License. See `LICENSE` for details.
+
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create your feature branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -am 'Add new feature'`
+4. Push to the branch: `git push origin feature/my-feature`
+5. Open a pull request
+
+## 📫 Contact
+
+For bugs, suggestions, or feature requests, open an issue or contact [eduardo@eduardo-luz.com](mailto:eduardo@eduardo-luz.com).
+
+---
+
+Made with ❤️ using PHP.
+
+
