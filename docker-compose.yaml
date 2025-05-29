@@ -1,0 +1,40 @@
+
+services: 
+
+    # Session storage
+    redis:
+        build: 
+            context: .docker/redis
+            dockerfile: Dockerfile
+        restart: always
+
+
+    app:
+        build: 
+            context: . 
+            dockerfile: .docker/app/Dockerfile
+        volumes: 
+            - "./src:/var/www/html"
+        env_file:
+            - ".env"
+        depends_on:
+            - redis
+            - db
+        ports:
+            - "${APP_EXTERNAL_PORT}:8080"
+
+
+    db:
+        build:
+            context: .
+            dockerfile: .docker/mongo/Dockerfile
+        restart: always
+        ports:
+        - "${DB_EXTERNAL_PORT}:27017"
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+            MONGO_INITDB_HOST: ${MONGO_HOST}
+            MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+
+

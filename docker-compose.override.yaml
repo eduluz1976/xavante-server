@@ -1,0 +1,25 @@
+
+services:
+    # Web client to access container 'redis'
+    # When in production, should be removed
+    redis-ui:
+        image: marian/rebrow
+        ports: 
+            - "${REDIS_UI_EXTERNAL_PORT}:5001"
+        depends_on: 
+            - redis
+
+
+    # Client to access and inspect the DB
+    # Should be removed when in production
+    mongo-client:
+        image: mongo-express:latest
+        ports:
+        - "${DB_UI_EXTERNAL_PORT}:8081"
+        environment:
+            ME_CONFIG_MONGODB_SERVER: ${MONGO_HOST}
+            ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
+            ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+        depends_on:
+            - db
+                    
