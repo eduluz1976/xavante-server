@@ -24,7 +24,7 @@ RUN ln -s /usr/bin/php82 /usr/bin/php
 RUN mkdir -p /var/www/html
 
 # Copy application files:
-ADD src /var/www/html
+ADD app /var/www/html
 ADD .docker/app/run.sh /tmp
 RUN chmod 755 /tmp/run.sh
 

@@ -14,7 +14,7 @@ services:
             context: . 
             dockerfile: .docker/app/Dockerfile
         volumes: 
-            - "./src:/var/www/html"
+            - "./app:/var/www/html"
         env_file:
             - ".env"
         depends_on:
@@ -28,13 +28,19 @@ services:
         build:
             context: .
             dockerfile: .docker/mongo/Dockerfile
+            args:
+                - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+                - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+                - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
         restart: always
-        ports:
-        - "${DB_EXTERNAL_PORT}:27017"
         environment:
             MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
             MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-            MONGO_INITDB_HOST: ${MONGO_HOST}
+            MONGO_INITDB_HOST: db
             MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+        volumes:
+            - "./.var/db_data:/data/db"
+        
+
 
 

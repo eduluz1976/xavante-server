@@ -5,6 +5,12 @@ A lightweight, open-source workflow engine to automate business processes using 
 
 ![Xavante Workflow Engine](docs/img/xavante.png)
 
+## Why Xavante? 
+This project is named Xavante (`"sha-VAHN-chee"`) as a tribute to the strength, structure, and resilience of the Xavante people of Brazil. Despite enduring persecution and displacement, they preserved their identity, traditions, and wisdom. Their dual clan system, sacred decision-making spaces, and powerful initiation rituals reflect a deep cultural logic—rooted in balance, endurance, and community.
+
+By choosing this name, I hope to honor their memory and legacy, and acknowledge the strength of Indigenous knowledge systems that continue to inspire, even in the world of modern technology. This is a gesture of respect—for a people whose cultural richness deserves to be remembered and celebrated.
+
+
 ## ✨ Features
 
 - 🛠 Native PHP 8.2 implementation
