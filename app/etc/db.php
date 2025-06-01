@@ -40,13 +40,14 @@ return [
             // Refer to the Doctrine documentation to see the full list
             // of valid parameters: https://www.doctrine-project.org/projects/doctrine-dbal/en/current/reference/configuration.html
             'connection' => [
-                'driver' => 'pdo_mysql',
+                'driver' => getenv(ConfigEnum::CONFIG_DB_DRIVER) ?: 'pdo_mysql',
                 'host' => getenv(ConfigEnum::CONFIG_DB_HOST),
                 'port' => getenv(ConfigEnum::CONFIG_DB_PORT),
                 'dbname' => getenv(ConfigEnum::CONFIG_DB_DATABASE),
-                'user' => getenv(ConfigEnum::CONFIG_DB_USERNAME),
+                'username' => getenv(ConfigEnum::CONFIG_DB_USERNAME),
                 'password' => getenv(ConfigEnum::CONFIG_DB_PASSWORD),
-                'charset' => 'utf8mb4'
+                'charset' => 'utf8mb4',
+                'uri' => getenv(ConfigEnum::CONFIG_DB_URI) ?: 'mongodb://db:27017',
             ]
         ]
     ]
