@@ -1,0 +1,31 @@
+@startuml "List Workflows"
+actor Client
+participant "ListWorkflowsAction" as Action
+participant "WorkflowService" as Service
+participant "WorkflowDTO" as DTO
+participant "WorkflowRepository" as Repository
+database "MongoDB"
+
+Client -> Action : GET /api/v1/workflows
+activate Action
+Action -> Service : listWorkflows()
+
+activate Service
+
+Service -> Repository : findAll()
+activate Repository
+Repository -> MongoDB : find({isDeleted: false})
+MongoDB --> Repository : List<WorkflowDocument>
+Repository --> Service : List<WorkflowDocument>
+deactivate Repository
+create DTO
+Service -> DTO
+
+Service -> Service: build list
+
+Action <-- Service : List<WorkflowDTO>
+deactivate Service
+
+Action --> Client : HTTP 200 OK + JSON[]
+deactivate Action
+@enduml

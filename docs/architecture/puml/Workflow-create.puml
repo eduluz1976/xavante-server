@@ -1,0 +1,46 @@
+@startuml "Workflow creation"
+actor Client
+participant "CreateWorkflowAction" as Action
+participant "CreateWorkflowRequestDTO" as DTO
+participant "WorkflowService"
+participant "WorkflowFactory" as Factory
+participant WorkflowDocument
+participant "WorkflowRepository" as Repository
+database "MongoDB"
+
+Client -> Action : POST /api/v1/workflows\n(name, description)
+activate Action
+create DTO
+Action -> DTO : new CreateWorkflowRequestDto(data)
+
+
+activate Action
+Action -> Action : validate($dto) using Symfony.Validation
+deactivate Action
+
+Action -> WorkflowService : createWorkflow($dto) 
+activate WorkflowService
+
+WorkflowService -> Factory : createFromDTO(dto)
+activate Factory
+
+create WorkflowDocument
+Factory -> WorkflowDocument : new Workflow(name, description, isDeleted=false)
+WorkflowService <- Factory : WorkflowDocument
+
+deactivate Factory
+
+WorkflowService -> Repository : save(Workflow)
+
+activate Repository
+
+Repository -> MongoDB : insert(Workflow)
+WorkflowService <-- Repository: WorkflowDocument with $id
+deactivate Repository
+
+deactivate WorkflowService
+
+Action <-- WorkflowService
+Action --> Client : HTTP 201 Created + ID
+deactivate Action
+@enduml

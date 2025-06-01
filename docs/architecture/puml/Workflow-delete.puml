@@ -1,0 +1,31 @@
+@startuml "Delete Workflow (Logical)"
+actor Client
+participant "DeleteWorkflowAction" as Action
+participant "WorkflowService"
+participant "WorkflowRepository" as Repository
+participant WorkflowDocument
+database "MongoDB"
+
+Client -> Action : DELETE /api/v1/workflows/{id}
+activate Action
+Action -> WorkflowService : deleteWorkflow($id)
+activate WorkflowService
+WorkflowService -> Repository : findById($id)
+activate Repository
+Repository -> MongoDB : findOne({_id: id, isDeleted: false})
+MongoDB --> Repository : WorkflowDocument
+Repository --> WorkflowService
+deactivate Repository
+
+WorkflowService -> WorkflowDocument : markAsDeleted()
+
+WorkflowService -> Repository : save(Workflow)
+activate Repository
+Repository -> MongoDB : update({_id: id}, {isDeleted: true})
+WorkflowService <-- Repository
+deactivate Repository
+Action <-- WorkflowService
+deactivate WorkflowService
+Action --> Client : HTTP 204 No Content
+deactivate Action
+@enduml

@@ -1,0 +1,75 @@
+@startuml "Application Structure"
+allowmixing
+
+package Interface {
+package Action {
+  package Workflow {
+    class CreateWorkflowAction
+    class UpdateWorkflowAction
+    class DeleteWorkflowAction
+    class GetWorkflowAction
+    class ListWorkflowsAction
+  }
+}
+
+package DTO {
+   package Workflow {
+     class CreateWorkflowRequestDTO
+     class UpdateWorkflowRequestDTO
+   }
+}
+}
+
+package Logic {
+
+package Service {
+  class WorkflowService
+}
+
+package Factory {
+  class WorkflowFactory
+}
+
+}
+
+package "Persistency" {
+
+ package "Document" {
+  class WorkflowDocument
+ }
+ package "Repository" {
+  package "Interface" {
+    interface WorkflowRepositoryInterface
+  }
+  package "Doctrine" {
+    class WorkflowRepository
+  }
+ }
+}
+package "Infrastructure" {
+  package "Persistence::MongoDB" {
+    database MongoDB
+  }
+}
+
+
+CreateWorkflowAction --> CreateWorkflowRequestDTO
+CreateWorkflowAction --> WorkflowService
+
+UpdateWorkflowAction --> UpdateWorkflowRequestDTO
+UpdateWorkflowAction --> WorkflowService
+
+DeleteWorkflowAction --> WorkflowService
+GetWorkflowAction --> WorkflowService
+ListWorkflowsAction --> WorkflowService
+
+WorkflowService --> WorkflowFactory
+WorkflowService --> WorkflowRepositoryInterface
+
+WorkflowFactory --> WorkflowDocument
+
+WorkflowRepository --|> WorkflowRepositoryInterface
+WorkflowRepository --> MongoDB
+WorkflowService --> WorkflowDocument
+
+@enduml

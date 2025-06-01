@@ -1,0 +1,50 @@
+@startuml "Update Workflow"
+actor Client
+participant "UpdateWorkflowAction" as Action
+participant "UpdateWorkflowRequestDTO" as DTO
+participant "WorkflowService"
+participant "WorkflowRepository" as Repository
+participant WorkflowDocument
+database "MongoDB"
+
+
+Client -> Action : PUT /api/v1/workflows/{id}\n(name, description)
+activate Action
+
+create DTO
+Action -> DTO : new UpdateWorkflowRequestDto(data)
+
+activate Action
+Action -> Action : validate($dto) using Symfony.Validation
+
+deactivate Action
+
+
+Action -> WorkflowService : updateWorkflow($id, $dto)
+activate WorkflowService
+
+WorkflowService -> Repository : findById($id)
+activate Repository
+
+Repository -> MongoDB : findOne({_id: id, isDeleted: false})
+MongoDB --> Repository 
+
+create WorkflowDocument
+Repository -> WorkflowDocument
+Repository --> WorkflowService
+deactivate Repository
+
+WorkflowService -> WorkflowDocument : setName(), setDescription(), setUpdatedAt()
+
+WorkflowService -> Repository : save(Workflow)
+activate Repository
+Repository -> MongoDB : update({_id: id}, {...})
+WorkflowService <-- Repository : WorkflowDocument
+deactivate Repository
+
+Action <-- WorkflowService : WorkflowDocument
+deactivate WorkflowService
+
+Action --> Client : HTTP 200 OK + JSON
+deactivate Action
+@enduml

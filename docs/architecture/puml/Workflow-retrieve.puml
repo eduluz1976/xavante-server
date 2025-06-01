@@ -1,0 +1,35 @@
+@startuml "Read Workflow"
+actor Client
+participant "GetWorkflowAction" as Action
+participant "WorkflowService"
+participant "WorkflowRepository" as Repository
+participant WorkflowDocument
+database "MongoDB"
+
+Client -> Action : GET /api/v1/workflows/{id}
+
+activate Action
+
+Action -> WorkflowService : getWorkflowById($id)
+
+activate WorkflowService
+
+WorkflowService -> Repository : findById($id)
+
+activate Repository
+
+Repository -> MongoDB : findOne({_id: id, isDeleted: false})
+MongoDB --> Repository 
+
+create WorkflowDocument
+Repository -> WorkflowDocument
+Repository --> WorkflowService : WorkflowDocument
+
+deactivate Repository
+
+Action <-- WorkflowService : WorkflowDocument
+deactivate WorkflowService
+
+Action --> Client : HTTP 200 OK + JSON
+deactivate Action
+@enduml
