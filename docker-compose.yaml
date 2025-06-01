@@ -1,7 +1,6 @@
 
 services: 
 
-    # Session storage
     redis:
         build: 
             context: .docker/redis
@@ -28,16 +27,12 @@ services:
         build:
             context: .
             dockerfile: .docker/mongo/Dockerfile
-            args:
-                - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
-                - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-                - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
         restart: always
         environment:
-            MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-            MONGO_INITDB_HOST: db
-            MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+            MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+            MONGO_INITDB_HOST: ${DB_HOST}
+            MONGO_INITDB_DATABASE: ${DB_NAME}
         volumes:
             - "./.var/db_data:/data/db"
         
