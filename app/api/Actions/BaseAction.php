@@ -7,7 +7,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Symfony\Component\Validator\Validation;
 use Xavante\API\DTO\BaseDTO;
 
-abstract class Base
+abstract class BaseAction
 {
     abstract public function __invoke(Request $request, Response $response, array $args=[]);
 
