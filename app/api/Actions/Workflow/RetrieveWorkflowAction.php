@@ -4,11 +4,10 @@ namespace Xavante\API\Actions\Workflow;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Xavante\API\Actions\Base;
 use Xavante\API\Services\WorkflowService;
 
 
-class RetrieveWorkflowAction extends Base
+class RetrieveWorkflowAction extends BaseWorkflowAction
 {
 
     public function __construct(private WorkflowService $workflowService){}
