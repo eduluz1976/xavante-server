@@ -16,7 +16,7 @@ interface RepositoryInterface
      * @param string $id
      * @return mixed
      */
-    public function findById(string $id, string $documentClassName) : BaseDocument;
+    public function findById(string $id, string $documentClassName) : ?BaseDocument;
 
     /**
      * Save a document.

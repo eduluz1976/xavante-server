@@ -28,14 +28,14 @@ $app->post('/api/v1/workflow', function (Request $request, Response $response, a
      return (new CreateWorkflowAction($workflowService))($request, $response, $args);
 });
 
-$app->get('/api/v1/workflow', function (Request $request, Response $response, array $args = []) use ($app) {
-     $documentManager = $app->getContainer()->get(DocumentManager::class);
-
-     return (new ListWorkflows($documentManager))($request, $response, $args);
-});
+// $app->get('/api/v1/workflow', function (Request $request, Response $response, array $args = []) use ($app) {
+//      $workflowService = new WorkflowService($app->getContainer()->get(RepositoryInterface::class));
+     
+//      return (new ListWorkflows($documentManager))($request, $response, $args);
+// });
 
 $app->get('/api/v1/workflow/{id}', function (Request $request, Response $response, array $args = []) use ($app) {
-     $documentManager = $app->getContainer()->get(DocumentManager::class);
+     $workflowService = new WorkflowService($app->getContainer()->get(RepositoryInterface::class));
 
-     return (new RetrieveWorkflow($documentManager))($request, $response, $args);
+     return (new RetrieveWorkflow($workflowService))($request, $response, $args);
 });

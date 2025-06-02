@@ -3,13 +3,10 @@
 namespace Xavante\API\Documents;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Xavante\API\DTO\Workflow\CreateWorkflowRequestDTO;
 
 #[ODM\Document (collection: 'workflows')]
 class Workflow extends BaseDocument {
 
-    #[ODM\Id]
-    public string $id;
     #[ODM\Field(type: 'string', nullable: false)]    
     public string $name;
     #[ODM\Field(type: 'date', options: ['default' => 'CURRENT_TIMESTAMP'])]
@@ -24,8 +21,11 @@ class Workflow extends BaseDocument {
     public string $ownerId;
 
     public function __construct(array $data = []) {
+        parent::__construct($data);
         $this->name = $data['name'] ?? '';
         $this->description = $data['description'] ?? null;
         $this->ownerId = $data['ownerId'] ?? '';
+
+        // \Doctrine\ODM\MongoDB\
     }
 }

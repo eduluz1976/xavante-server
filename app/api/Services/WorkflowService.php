@@ -30,4 +30,15 @@ class WorkflowService {
 
         return new WorkflowDTO($documentResult->jsonSerialize());
     }
+
+    public function getWorkflowById(string $id): WorkflowDTO
+    {
+        $workflow = $this->repository->findById($id, Workflow::class);
+
+        if (!$workflow) {
+            throw new \RuntimeException('Workflow not found');
+        }
+
+        return new WorkflowDTO($workflow->jsonSerialize());
+    }
 }

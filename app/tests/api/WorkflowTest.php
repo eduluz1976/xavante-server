@@ -50,5 +50,20 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         self::$workflowId = $responseBody['id'];
     }
 
+    /**
+     * @depends testCreateWorkflow
+     */
+    public function testGetWorkflow(): void
+    {
+        $resp = self::$client->get(self::URI_PREFIX . '/workflow/' . self::$workflowId);
+
+        $this->assertEquals(200, $resp->getStatusCode());
+        $responseBody = json_decode($resp->getBody()->getContents(), true);
+
+        $this->assertArrayHasKey('id', $responseBody);
+        $this->assertEquals(self::$workflowId, $responseBody['id']);
+        $this->assertEquals(self::$workflowData['name'], $responseBody['name']);
+        $this->assertEquals(self::$workflowData['description'], $responseBody['description']);
+    }
 
 }

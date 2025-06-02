@@ -1,10 +1,15 @@
 <?php
 
 namespace Xavante\API\Documents;
-
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 abstract class BaseDocument implements \JsonSerializable
 {
+
+    #[ODM\Id]
+    public ?string $id;
+
+
     /**
      * Convert the document to an array.
      *
@@ -33,5 +38,10 @@ abstract class BaseDocument implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return $this->toArray();
+    }
+
+    public function __construct(array $data = [])
+    {
+        $this->id = $data['_id'] ?? ($data['id'] ?? null);
     }
 }
