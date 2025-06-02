@@ -27,6 +27,8 @@ class Mongo implements RepositoryInterface
 
     public function deleteById(string $id, string $documentClassName): bool
     {
+        /**  @disregard P1009 Undefined type  */ 
+        $id = new \MongoDB\BSON\ObjectId($id);
         $result = $this->documentManager->getDocumentCollection($documentClassName)->deleteOne(['_id' => $id]);
         return $result->getDeletedCount() > 0;
     }

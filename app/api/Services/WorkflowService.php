@@ -43,6 +43,19 @@ class WorkflowService {
         return new WorkflowDTO($workflow->jsonSerialize());
     }
 
+    public function deleteWorkflow(string $id): WorkflowDTO
+    {
+        $workflow = $this->repository->findById($id, Workflow::class);
+
+        if (!$workflow) {
+            throw new \RuntimeException('Workflow not found');
+        }
+
+        $this->repository->deleteById($id, Workflow::class);
+
+        return new WorkflowDTO($workflow->jsonSerialize());
+    }
+
     public function updateWorkflow(WorkflowDTO $existingWorkflow, UpdateWorkflowRequestDTO $updateRequest): WorkflowDTO
     {
         // Update the existing workflow with new data

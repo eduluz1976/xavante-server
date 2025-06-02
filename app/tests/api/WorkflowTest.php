@@ -93,6 +93,9 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($updatedData['description'], $responseBody['description']);
     }
 
+    /**
+     * @depends testGetWorkflow
+     */
     public function testListAllWorkflows(): void
     {
         $resp = self::$client->get(self::URI_PREFIX . '/workflow');
@@ -119,6 +122,34 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($found, 'Created workflow not found in the list');
 
         self::$countRows = $responseBody['count'];
+    }
+
+    public function testDeleteWorkflow(): void
+    {
+        $resp = self::$client->delete(self::URI_PREFIX . '/workflow/' . self::$workflowId);
+
+        $this->assertEquals(200, $resp->getStatusCode());
+        $responseBody = json_decode($resp->getBody()->getContents(), true);
+
+        $this->assertArrayHasKey('id', $responseBody);
+        $this->assertEquals(self::$workflowId, $responseBody['id']);
+
+
+
+
+        $respGetWorkflows = self::$client->get(self::URI_PREFIX . '/workflow');
+
+        $this->assertEquals(200, $respGetWorkflows->getStatusCode());
+        $responseBody = json_decode($respGetWorkflows->getBody()->getContents(), true);
+
+        $this->assertIsArray($responseBody);
+        $this->assertNotEmpty($responseBody);
+
+        $this->assertArrayHasKey('count', $responseBody);
+        $this->assertEquals(self::$countRows-1, $responseBody['count']);
+        $this->assertArrayHasKey('rows', $responseBody);
+        $this->assertCount(self::$countRows-1, $responseBody['rows']);
+
     }
     
 
