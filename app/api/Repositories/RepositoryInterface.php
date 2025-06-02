@@ -39,5 +39,5 @@ interface RepositoryInterface
      *
      * @return array
      */
-    public function getAll(string $documentClassName): array;
+    public function findAll(string $documentClassName, array $filters = []): array;
 }

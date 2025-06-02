@@ -7,6 +7,7 @@ use \Xavante\API\Actions\Status;
 use \Xavante\API\Actions\Workflow\CreateWorkflowAction;
 use Xavante\API\Actions\Workflow\RetrieveWorkflowAction;
 use Xavante\API\Actions\Workflow\UpdateWorkflowAction;
+use Xavante\API\Actions\Workflow\ListWorkflowsAction;
 use Xavante\API\Repositories\RepositoryInterface;
 use Xavante\API\Services\WorkflowService;
 
@@ -25,11 +26,11 @@ $app->post('/api/v1/workflow', function (Request $request, Response $response, a
      return (new CreateWorkflowAction($workflowService))($request, $response, $args);
 });
 
-// $app->get('/api/v1/workflow', function (Request $request, Response $response, array $args = []) use ($app) {
-//      $workflowService = new WorkflowService($app->getContainer()->get(RepositoryInterface::class));
+$app->get('/api/v1/workflow', function (Request $request, Response $response, array $args = []) use ($app) {
+     $workflowService = new WorkflowService($app->getContainer()->get(RepositoryInterface::class));
      
-//      return (new ListWorkflows($documentManager))($request, $response, $args);
-// });
+     return (new ListWorkflowsAction($workflowService))($request, $response, $args);
+});
 
 $app->get('/api/v1/workflow/{id}', function (Request $request, Response $response, array $args = []) use ($app) {
      $workflowService = new WorkflowService($app->getContainer()->get(RepositoryInterface::class));

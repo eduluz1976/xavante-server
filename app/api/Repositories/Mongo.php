@@ -31,9 +31,17 @@ class Mongo implements RepositoryInterface
         return $result->getDeletedCount() > 0;
     }
 
-    public function getAll(string $documentClassName): array
+    public function findAll(string $documentClassName, array $filters = []): array
     {
-        return (array) $this->documentManager->getDocumentCollection($documentClassName)->find();
+        $query = $this->documentManager->getDocumentCollection($documentClassName)->find($filters);
+
+        $result = [];
+
+        foreach ($query as $item) {
+            $result[] = new $documentClassName($item);
+        }
+
+        return (array) $result;
     }
 
 }

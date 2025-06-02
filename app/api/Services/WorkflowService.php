@@ -57,4 +57,17 @@ class WorkflowService {
 
         return new WorkflowDTO($documentResult->jsonSerialize());
     }
+
+    public function findAllWorkflows(array $filters = []): array
+    {
+        $workflows = $this->repository->findAll(Workflow::class, $filters);
+
+        if (!$workflows) {
+            return [];
+        }
+
+        return array_map(function ($workflow) {
+            return new WorkflowDTO($workflow->jsonSerialize());
+        }, $workflows);
+    }
 }

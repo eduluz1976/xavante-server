@@ -14,6 +14,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     protected static $baseUri = 'http://app:8080';
     protected static $workflowId;
     protected static $workflowData;
+    protected static $countRows = 0;
     
 
     public static function setUpBeforeClass(): void
@@ -90,6 +91,34 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::$workflowId, $responseBody['id']);
         $this->assertEquals($updatedData['name'], $responseBody['name']);
         $this->assertEquals($updatedData['description'], $responseBody['description']);
+    }
+
+    public function testListAllWorkflows(): void
+    {
+        $resp = self::$client->get(self::URI_PREFIX . '/workflow');
+
+        $this->assertEquals(200, $resp->getStatusCode());
+        $responseBody = json_decode($resp->getBody()->getContents(), true);
+
+        $this->assertIsArray($responseBody);
+        $this->assertNotEmpty($responseBody);
+
+        $this->assertArrayHasKey('count', $responseBody);
+        $this->assertTrue($responseBody['count'] > 0);
+        $this->assertArrayHasKey('rows', $responseBody);
+        $this->assertCount($responseBody['count'], $responseBody['rows']);
+
+        // Check if the created workflow is in the list
+        $found = false;
+        foreach ($responseBody['rows'] as $workflow) {
+            if ($workflow['id'] === self::$workflowId) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Created workflow not found in the list');
+
+        self::$countRows = $responseBody['count'];
     }
     
 
