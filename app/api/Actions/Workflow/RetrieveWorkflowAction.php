@@ -2,19 +2,13 @@
 
 namespace Xavante\API\Actions\Workflow;
 
-use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Types\ObjectIdType;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Xavante\API\Documents\Workflow as WorkflowDocument;
-use Xavante\API\DTOs\CreateWorkflowRequest;
-use Xavante\API\DTOs\ItemWorkflow;
 use Xavante\API\Actions\Base;
 use Xavante\API\Services\WorkflowService;
 
 
-
-class RetrieveWorkflow extends Base
+class RetrieveWorkflowAction extends Base
 {
 
     public function __construct(private WorkflowService $workflowService){}

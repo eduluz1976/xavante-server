@@ -1,15 +1,11 @@
 <?php
 
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-
 use \Xavante\API\Actions\Authenticate;
 use \Xavante\API\Actions\Status;
 use \Xavante\API\Actions\Workflow\CreateWorkflowAction;
-use Xavante\API\Actions\Workflow\ListWorkflows;
-use Xavante\API\Actions\Workflow\RetrieveWorkflow;
-use Xavante\API\Repositories\Mongo;
+use Xavante\API\Actions\Workflow\RetrieveWorkflowAction;
 use Xavante\API\Repositories\RepositoryInterface;
 use Xavante\API\Services\WorkflowService;
 
@@ -37,5 +33,5 @@ $app->post('/api/v1/workflow', function (Request $request, Response $response, a
 $app->get('/api/v1/workflow/{id}', function (Request $request, Response $response, array $args = []) use ($app) {
      $workflowService = new WorkflowService($app->getContainer()->get(RepositoryInterface::class));
 
-     return (new RetrieveWorkflow($workflowService))($request, $response, $args);
+     return (new RetrieveWorkflowAction($workflowService))($request, $response, $args);
 });
