@@ -5,6 +5,7 @@ namespace Xavante\API\Actions\Workflow;
 use \Xavante\API\Actions\Base;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Xavante\API\DTO\Workflow\CreateWorkflowRequestDTO;
+use Xavante\API\DTO\BaseDTO;
 
 
 
@@ -17,12 +18,12 @@ abstract class BaseWorkflowAction extends Base
         return $data ?: [];
     }
 
-    protected function getDTOFromRequest(array $data): CreateWorkflowRequestDTO
+    protected function getDTOFromRequest(array $data): BaseDTO
     {
         return new CreateWorkflowRequestDTO($data);
     }
 
-    protected function validateRequestData(CreateWorkflowRequestDTO $requestDTO): void
+    protected function validateRequestData(BaseDTO $requestDTO): void
     {
         $errors = [];
 

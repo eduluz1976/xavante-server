@@ -4,7 +4,9 @@ namespace Xavante\API\Factories;
 
 use Xavante\API\Documents\Workflow;
 use Xavante\API\DTO\Workflow\CreateWorkflowRequestDTO;
+use Xavante\API\DTO\Workflow\UpdateWorkflowRequestDTO;
 use \Xavante\API\Documents\Workflow as WorkflowDocument;
+use Xavante\API\DTO\Workflow\WorkflowDTO;
 
 
 class WorkflowFactory {
@@ -28,5 +30,17 @@ class WorkflowFactory {
     public static function createDocumentFromArray(array $data): WorkflowDocument
     {
         return new WorkflowDocument($data);
+    }
+
+    public static function updateDocumentFromRequestDTO(WorkflowDTO $existingWorkflow, UpdateWorkflowRequestDTO $updateRequest): WorkflowDocument
+    {
+        // Update the existing workflow with new data
+        $existingWorkflow->name = $updateRequest->name;
+        $existingWorkflow->description = $updateRequest->description;
+        $existingWorkflow->ownerId = $updateRequest->ownerId;
+        $existingWorkflow->status = $updateRequest->status;
+        $existingWorkflow->updatedAt = new \DateTime();
+
+        return new WorkflowDocument($existingWorkflow->jsonSerialize());
     }
 }

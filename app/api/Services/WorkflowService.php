@@ -3,6 +3,7 @@
 namespace Xavante\API\Services;
 
 use Xavante\API\DTO\Workflow\CreateWorkflowRequestDTO;
+use Xavante\API\DTO\Workflow\UpdateWorkflowRequestDTO;
 use Xavante\API\Documents\Workflow;
 use Xavante\API\DTO\Workflow\WorkflowDTO;
 use Xavante\API\Factories\WorkflowFactory;
@@ -40,5 +41,20 @@ class WorkflowService {
         }
 
         return new WorkflowDTO($workflow->jsonSerialize());
+    }
+
+    public function updateWorkflow(WorkflowDTO $existingWorkflow, UpdateWorkflowRequestDTO $updateRequest): WorkflowDTO
+    {
+        // Update the existing workflow with new data
+        $updatedWorkflow = WorkflowFactory::updateDocumentFromRequestDTO($existingWorkflow, $updateRequest);
+
+        // Save the updated workflow
+        $documentResult = $this->repository->save($updatedWorkflow);
+
+        if (!$documentResult) {
+            throw new \RuntimeException('Failed to update workflow');
+        }
+
+        return new WorkflowDTO($documentResult->jsonSerialize());
     }
 }

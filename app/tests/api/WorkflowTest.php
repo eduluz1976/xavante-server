@@ -66,4 +66,32 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::$workflowData['description'], $responseBody['description']);
     }
 
+
+    /**
+     * @depends testGetWorkflow
+     */
+    public function testUpdateWorkflow(): void
+    {
+        $updatedData = [
+            'name' => 'Updated Workflow Name',
+            'description' => 'Updated description.',
+            'ownerId' => 'updated_owner_id',
+            'status' => 'active'
+        ];
+
+        $resp = self::$client->put(self::URI_PREFIX . '/workflow/' . self::$workflowId, [
+            'json' => $updatedData
+        ]);
+
+        $this->assertEquals(200, $resp->getStatusCode());
+        $responseBody = json_decode($resp->getBody()->getContents(), true);
+
+        $this->assertArrayHasKey('id', $responseBody);
+        $this->assertEquals(self::$workflowId, $responseBody['id']);
+        $this->assertEquals($updatedData['name'], $responseBody['name']);
+        $this->assertEquals($updatedData['description'], $responseBody['description']);
+    }
+    
+
+
 }
