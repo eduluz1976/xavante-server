@@ -2,32 +2,38 @@
 
 namespace Xavante\API\Factories;
 
-use Xavante\API\Documents\Workflow;
-use Xavante\API\DTO\Workflow\CreateWorkflowRequestDTO;
 use Xavante\API\DTO\Workflow\UpdateWorkflowRequestDTO;
+use Xavante\API\DTO\Task\CreateWorkflowTaskRequestDTO;
+use Xavante\API\Documents\WorkflowTask as WorkflowTaskDocument;
 use \Xavante\API\Documents\Workflow as WorkflowDocument;
 use Xavante\API\DTO\Workflow\WorkflowDTO;
+use Kodus\Helpers\UUID;
 
 
-class WorkflowFactory {
+class WorkflowTaskFactory {
     /**
-     * Create a new workflow from the given data.
+     * Create a new workflow task from the given data.
      *
      * @param array $data
-     * @return \Xavante\API\Documents\Workflow
+     * @return \Xavante\API\Documents\WorkflowTask
      */
-    public static function createDocumentFromRequestDTO(CreateWorkflowRequestDTO $dto): WorkflowDocument
+    public static function createDocumentFromRequestDTO(CreateWorkflowTaskRequestDTO $dto): WorkflowTaskDocument
     {
-        return new WorkflowDocument($dto->jsonSerialize());
+        $dto = new WorkflowTaskDocument($dto->jsonSerialize());
+        
+
+        // generate uuid from php native function
+        $dto->id = UUID::create();
+        return $dto;
     }
 
     /**
      * Create a workflow DTO from an array.
      *
      * @param array $data
-     * @return \Xavante\API\Documents\Workflow
+     * @return \Xavante\API\DTO\Workflow\WorkflowDTO
      */
-    public static function createDocumentFromArray(array $data) : WorkflowDocument
+    public static function createDocumentFromArray(array $data): WorkflowDocument
     {
         return new WorkflowDocument($data);
     }
@@ -39,7 +45,7 @@ class WorkflowFactory {
         $existingWorkflow->description = $updateRequest->description;
         $existingWorkflow->ownerId = $updateRequest->ownerId;
         $existingWorkflow->status = $updateRequest->status;
-        $existingWorkflow->updatedAt = new \DateTime();        
+        $existingWorkflow->updatedAt = new \DateTime();
 
         return new WorkflowDocument($existingWorkflow->jsonSerialize());
     }

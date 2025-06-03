@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5fc4c1f70255481302c9cc665d71ee42",
+    "content-hash": "7c59b678b9510e84563d79b440123e0c",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -1637,6 +1637,50 @@
                 "source": "https://github.com/Jean85/pretty-package-versions/tree/2.1.1"
             },
             "time": "2025-03-19T14:43:43+00:00"
+        },
+        {
+            "name": "kodus/uuid-v4",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kodus/uuid-v4.git",
+                "reference": "a080b410d0f7a2d1be8c6bfa57165b27c617b194"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kodus/uuid-v4/zipball/a080b410d0f7a2d1be8c6bfa57165b27c617b194",
+                "reference": "a080b410d0f7a2d1be8c6bfa57165b27c617b194",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "codeception/codeception": "^5",
+                "codeception/module-asserts": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kodus\\Helpers\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "René Højbjerg Larsen",
+                    "email": "rhl@jfmedier.dk"
+                }
+            ],
+            "description": "Simple UUID v4 generator",
+            "support": {
+                "issues": "https://github.com/kodus/uuid-v4/issues",
+                "source": "https://github.com/kodus/uuid-v4/tree/1.3.0"
+            },
+            "time": "2025-01-09T12:29:31+00:00"
         },
         {
             "name": "laminas/laminas-code",

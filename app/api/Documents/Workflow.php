@@ -19,13 +19,24 @@ class Workflow extends BaseDocument {
     public string $description;
     #[ODM\Field(type: 'string', nullable: false)]
     public string $ownerId;
+    #[ODM\Field(type: 'hash', nullable: true)]
+    public array $tasks;
 
     public function __construct(array $data = []) {
         parent::__construct($data);
         $this->name = $data['name'] ?? '';
         $this->description = $data['description'] ?? null;
         $this->ownerId = $data['ownerId'] ?? '';
+        $this->tasks = $data['tasks'] ?? [];
 
-        // \Doctrine\ODM\MongoDB\
+    }
+
+
+    public function addTask(WorkflowTask $task): void
+    {
+        if (!isset($this->tasks)) {
+            $this->tasks = [];
+        }
+        $this->tasks[$task->id] = $task->jsonSerialize();
     }
 }

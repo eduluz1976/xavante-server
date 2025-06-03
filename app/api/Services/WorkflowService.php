@@ -40,6 +40,7 @@ class WorkflowService {
             throw new \RuntimeException('Workflow not found');
         }
 
+
         return new WorkflowDTO($workflow->jsonSerialize());
     }
 

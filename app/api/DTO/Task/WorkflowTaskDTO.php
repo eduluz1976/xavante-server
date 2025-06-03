@@ -1,10 +1,10 @@
 <?php
 
-namespace Xavante\API\DTO\Workflow;
+namespace Xavante\API\DTO\Task;
 
 use Xavante\API\DTO\BaseDTO;
 
-class WorkflowDTO extends BaseDTO
+class WorkflowTaskDTO extends BaseDTO
 {
     public string $id;
     public string $name;
@@ -13,7 +13,7 @@ class WorkflowDTO extends BaseDTO
     public \DateTime $createdAt;
     public \DateTime $updatedAt;
     public string $status;
-    public array $tasks = [];
+    public string $workflowId;
 
 
 
@@ -32,7 +32,6 @@ class WorkflowDTO extends BaseDTO
         $this->createdAt = isset($data['createdAt']) ? new \DateTime($data['createdAt']) : new \DateTime();
         $this->updatedAt = isset($data['updatedAt']) ? new \DateTime($data['updatedAt']) : new \DateTime();
         $this->status = $data['status'] ?? 'draft';
-        $this->tasks = $data['tasks'] ?? [];
 
         return $this;
     }
@@ -48,7 +47,6 @@ class WorkflowDTO extends BaseDTO
             'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
             'status' => $this->status,
-            'tasks' => $this->tasks,
         ];
     }
 

@@ -37,6 +37,7 @@
         "doctrine/mongodb-odm-bundle": "^5.2.1",
         "guzzlehttp/guzzle": "^7.9",
         "symfony/validator": "^7.3",
-        "php-di/slim-bridge": "^3.4"
+        "php-di/slim-bridge": "^3.4",
+        "kodus/uuid-v4": "^1.3"
     }
 }

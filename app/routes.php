@@ -11,6 +11,9 @@ use Xavante\API\Actions\Workflow\DeleteWorkflowAction;
 use Xavante\API\Actions\Workflow\ListWorkflowsAction;
 use Xavante\API\Repositories\RepositoryInterface;
 use Xavante\API\Services\WorkflowService;
+use Xavante\API\Services\WorkflowTaskService;
+use Xavante\API\Actions\Task\CreateWorkflowTaskAction;
+
 
 $app->post('/api/v1/auth', function (Request $request, Response $response, array $args = []) {
      return (new Authenticate())($request, $response, $args);
@@ -49,4 +52,11 @@ $app->delete('/api/v1/workflow/{id}', function (Request $request, Response $resp
      $workflowService = new WorkflowService($app->getContainer()->get(RepositoryInterface::class));
 
      return (new DeleteWorkflowAction($workflowService))($request, $response, $args);
+});
+
+
+$app->post('/api/v1/workflow/{workflow_id}/task', function (Request $request, Response $response, array $args = []) use ($app) {
+     $workflowService = new WorkflowService($app->getContainer()->get(RepositoryInterface::class));
+     $workflowTaskService = new WorkflowTaskService($app->getContainer()->get(RepositoryInterface::class), $workflowService);
+     return (new CreateWorkflowTaskAction($workflowTaskService, $workflowService))($request, $response, $args);
 });
