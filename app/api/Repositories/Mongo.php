@@ -15,6 +15,9 @@ class Mongo implements RepositoryInterface
         /**  @disregard P1009 Undefined type  */ 
         $id = new \MongoDB\BSON\ObjectId($id);
         $arr = $this->documentManager->getDocumentCollection($documentClassName)->findOne(['_id'=>$id]);
+        if ($arr === null) {
+            return null;
+        }
         return  new $documentClassName($arr);
     }
 

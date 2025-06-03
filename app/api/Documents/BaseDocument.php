@@ -40,7 +40,7 @@ abstract class BaseDocument implements \JsonSerializable
         return $this->toArray();
     }
 
-    public function __construct(array $data = [])
+    public function __construct(?array $data = [])
     {
         $this->id = $data['_id'] ?? ($data['id'] ?? null);
     }

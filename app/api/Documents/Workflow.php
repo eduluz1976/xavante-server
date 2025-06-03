@@ -17,12 +17,16 @@ class Workflow extends BaseDocument {
     public string $status;
     #[ODM\Field(type: 'string', nullable: true)]    
     public string $description;
-    #[ODM\Field(type: 'string', nullable: false)]
+    #[ODM\Field(type: 'string', nullable: true)]
     public string $ownerId;
     #[ODM\Field(type: 'hash', nullable: true)]
-    public array $tasks;
+    public ?array $tasks = [];
 
-    public function __construct(array $data = []) {
+    public function __construct(?array $data = []) {
+
+        if ($data === null) {
+            return;
+        }
         parent::__construct($data);
         $this->name = $data['name'] ?? '';
         $this->description = $data['description'] ?? null;
