@@ -2,8 +2,8 @@
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use \Xavante\API\Actions\Authenticate;
-use \Xavante\API\Actions\Status;
+use \Xavante\API\Actions\AuthenticateAction;
+use \Xavante\API\Actions\StatusAction;
 use \Xavante\API\Actions\Workflow\CreateWorkflowAction;
 use Xavante\API\Actions\Workflow\RetrieveWorkflowAction;
 use Xavante\API\Actions\Workflow\UpdateWorkflowAction;
@@ -12,16 +12,20 @@ use Xavante\API\Actions\Workflow\ListWorkflowsAction;
 use Xavante\API\Repositories\RepositoryInterface;
 use Xavante\API\Services\WorkflowService;
 use Xavante\API\Services\WorkflowTaskService;
+use Xavante\API\Services\AuthenticationService;
 use Xavante\API\Actions\Task\CreateWorkflowTaskAction;
 
 
-$app->post('/api/v1/auth', function (Request $request, Response $response, array $args = []) {
-     return (new Authenticate())($request, $response, $args);
+$app->post('/api/v1/auth', function (Request $request, Response $response, array $args = []) use ($app) {
+
+     $authenticationService = new AuthenticationService($app->getContainer()->get(RepositoryInterface::class));
+
+     return (new AuthenticateAction($authenticationService))($request, $response, $args);
 });
 
 
 $app->get('/api/v1/status', function (Request $request, Response $response, array $args = []) {
-     return (new Status())($request, $response, $args);
+     return (new StatusAction())($request, $response, $args);
 });
 
 

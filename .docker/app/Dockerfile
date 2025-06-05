@@ -15,6 +15,7 @@ RUN apk update \
        php82-mysqli php82-pdo_mysql php82-json php82-pdo php82-curl \
        php82-ctype php82-xdebug php82-pecl-mongodb php82-pecl-redis \
        php82-pecl-xdebug \     
+       php82-sodium libsodium libsodium-dev \
     && rm -f /var/cache/apk/*
 
 RUN sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/g' /etc/php82/php.ini
