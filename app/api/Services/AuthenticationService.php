@@ -2,24 +2,26 @@
 
 namespace Xavante\API\Services;
 
-use Xavante\API\DTO\Auth\AuthPayloadDTO;
 use DateTimeImmutable;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\JwtFacade;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\Clock\FrozenClock;
+use Lcobucci\JWT\Validation\Constraint;
+
 
 class AuthenticationService {
 
   public function __construct(
-        private \Xavante\API\Repositories\RepositoryInterface $repository
+        protected \Xavante\API\Repositories\RepositoryInterface $repository,
+        protected \Xavante\API\Services\ConfigurationService $config,
     ) {
     }
 
     protected function validateTimestamp($timestamp) {
 
-        // TODO: set as config
-        $ttl = 43200; // 30 days
+        $ttl = $this->config->get('AUTH_SESSION_TTL',43200);
 
         $date = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
@@ -62,10 +64,13 @@ class AuthenticationService {
 
     protected function createAuthToken(string $clientId) : string {
 
-        // TODO: set as config
+
         $key = InMemory::base64Encoded(
-            'hiG8DlOKvtih6AxlZn5XKImZ06yu8I3mkOzaJrEuW8yAv8Jnkw330uMt8AEqQ5LB'
+            $this->config->get('AUTH_SERVER_SECRET_KEY')
         );
+
+        $config = $this->config;
+
 
         // TODO: set these variables as config
         $token = (new JwtFacade())->issue(
@@ -75,12 +80,31 @@ class AuthenticationService {
                 Builder $builder,
                 DateTimeImmutable $issuedAt
             ): Builder => $builder
-                ->issuedBy('https://dev.xavante.dev')
-                ->permittedFor('https://systlets.com')
+                ->issuedBy($config->get('AUTH_TOKEN_ISSUED_BY'))
+                ->permittedFor($config->get('AUTH_TOKEN_PERMITTED_FOR'))
                 ->identifiedBy($clientId)
-                ->expiresAt($issuedAt->modify('+10 minutes'))
+                ->expiresAt($issuedAt->modify($config->get('AUTH_TOKEN_EXPIRES_AT')))
         );
         return $token->toString();
+    }
+
+    public function verifyAuthToken(string $token) 
+    {
+        $key = InMemory::base64Encoded(
+            $this->config->get('AUTH_SERVER_SECRET_KEY')
+        );
+
+        $authObj = (new JwtFacade())->parse(
+            $token,
+            new Constraint\SignedWith(new Sha256(), $key),
+            new Constraint\StrictValidAt(
+                new FrozenClock(new DateTimeImmutable('now', new \DateTimeZone('UTC')))
+            )
+        );
+
+        $authData = $authObj->claims()->all();
+
+        $this->config->setData('CUSTOMER_ID', $authData['jti']);
     }
 
 

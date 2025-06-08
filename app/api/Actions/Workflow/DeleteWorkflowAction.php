@@ -10,7 +10,7 @@ use Xavante\API\Services\WorkflowService;
 class DeleteWorkflowAction extends BaseWorkflowAction
 {
 
-    public function __construct(private WorkflowService $workflowService){}
+    // public function __construct(private WorkflowService $workflowService){}
 
 
 

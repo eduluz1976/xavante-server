@@ -15,6 +15,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     protected static $workflowId;
     protected static $workflowData;
     protected static $countRows = 0;
+    protected static $authToken;
     
 
     public static function setUpBeforeClass(): void
@@ -25,6 +26,22 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
             'http_errors' => false,
             'headers' => ['Accept' => 'application/json'],
         ]);
+
+        // Authenticate
+        $authResponse = self::$client->post(self::URI_PREFIX.'/auth',[
+            'headers' => [
+                'X-ACCESS-TOKEN' => getenv('AUTH_TEST_ACCESS_TOKEN'),
+                'X-ACCESS-CHECK' => getenv('AUTH_TEST_ACCESS_CHECK'),
+            ]
+        ]);
+
+        assert($authResponse->getStatusCode() === 200);
+
+        // Authorization
+        $authToken = $authResponse->getHeader('Authorization');
+
+        self::$authToken = 'Bearer '. $authToken[0];
+
     }
 
     public function testCreateWorkflow(): void
@@ -38,8 +55,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
         
         // Ensure the workflow name is unique by appending the current timestamp
-        $resp = self::$client->post(self::URI_PREFIX . '/workflow', [
-            'json' => self::$workflowData
+        $resp = self::$client->post($this->getWorkflowBaseURI(), [
+            'json' => self::$workflowData,
+            'headers' => [
+                'Authorization' => self::$authToken
+            ]
         ]);
 
         $this->assertEquals(201, $resp->getStatusCode());
@@ -56,7 +76,12 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetWorkflow(): void
     {
-        $resp = self::$client->get(self::URI_PREFIX . '/workflow/' . self::$workflowId);
+        $resp = self::$client->get($this->getWorkflowURIWithId(),[
+        'headers' => [
+                'Authorization' => self::$authToken
+            ]
+        ]
+    );
 
         $this->assertEquals(200, $resp->getStatusCode());
         $responseBody = json_decode($resp->getBody()->getContents(), true);
@@ -80,8 +105,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
             'status' => 'active'
         ];
 
-        $resp = self::$client->put(self::URI_PREFIX . '/workflow/' . self::$workflowId, [
-            'json' => $updatedData
+        $resp = self::$client->put($this->getWorkflowURIWithId(), [
+            'json' => $updatedData,
+            'headers' => [
+                'Authorization' => self::$authToken
+            ]
         ]);
 
         $this->assertEquals(200, $resp->getStatusCode());
@@ -93,12 +121,26 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($updatedData['description'], $responseBody['description']);
     }
 
+    protected function getWorkflowURIWithId() {
+        return sprintf("%s/workflow/%s",self::URI_PREFIX,self::$workflowId);
+    }
+
+
+    protected function getWorkflowBaseURI() {
+        return sprintf("%s/workflow",self::URI_PREFIX);
+    }
+
     /**
      * @depends testGetWorkflow
      */
     public function testListAllWorkflows(): void
     {
-        $resp = self::$client->get(self::URI_PREFIX . '/workflow');
+        $resp = self::$client->get(self::URI_PREFIX . '/workflow',[
+            'headers' => [
+                'Authorization' => self::$authToken
+            ]
+        ]
+    );
 
         $this->assertEquals(200, $resp->getStatusCode());
         $responseBody = json_decode($resp->getBody()->getContents(), true);
@@ -126,7 +168,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteWorkflow(): void
     {
-        $resp = self::$client->delete(self::URI_PREFIX . '/workflow/' . self::$workflowId);
+        $resp = self::$client->delete(self::URI_PREFIX . '/workflow/' . self::$workflowId,[
+            'headers' => [
+                'Authorization' => self::$authToken
+            ]
+        ]);
 
         $this->assertEquals(200, $resp->getStatusCode());
         $responseBody = json_decode($resp->getBody()->getContents(), true);
@@ -134,10 +180,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('id', $responseBody);
         $this->assertEquals(self::$workflowId, $responseBody['id']);
 
-
-
-
-        $respGetWorkflows = self::$client->get(self::URI_PREFIX . '/workflow');
+        $respGetWorkflows = self::$client->get(self::URI_PREFIX . '/workflow',[
+            'headers' => [
+                'Authorization' => self::$authToken
+            ]
+        ]);
 
         $this->assertEquals(200, $respGetWorkflows->getStatusCode());
         $responseBody = json_decode($respGetWorkflows->getBody()->getContents(), true);

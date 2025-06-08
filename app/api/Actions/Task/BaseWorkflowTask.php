@@ -11,7 +11,16 @@ use Xavante\API\DTO\BaseDTO;
 abstract class BaseWorkflowTask extends BaseAction
 {
 
-    public function __construct(protected WorkflowTaskService $workflowTaskService, protected WorkflowService $workflowService) {}
+    protected WorkflowTaskService $workflowTaskService;
+    protected WorkflowService $workflowService;
+
+    public function __construct($app) {
+        parent::__construct($app);
+        // protected WorkflowTaskService $workflowTaskService, protected WorkflowService $workflowService        
+        $this->workflowTaskService = $app->getContainer()->get(WorkflowTaskService::class);
+        $this->workflowService = $app->getContainer()->get(WorkflowService::class);
+
+    }
 
     protected function getCreateDTOFromRequest(array $data): BaseDTO
     {

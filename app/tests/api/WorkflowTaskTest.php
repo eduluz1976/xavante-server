@@ -16,6 +16,7 @@ class WorkflowTaskTest extends \PHPUnit\Framework\TestCase
     protected static $workflowData;
     protected static $taskData;
     protected static $taskId;
+    protected static $authToken;
 
     public static function setUpBeforeClass(): void
     {
@@ -25,6 +26,21 @@ class WorkflowTaskTest extends \PHPUnit\Framework\TestCase
             'http_errors' => false,
             'headers' => ['Accept' => 'application/json'],
         ]);
+
+        // Authenticate
+        $authResponse = self::$client->post(self::URI_PREFIX.'/auth',[
+            'headers' => [
+                'X-ACCESS-TOKEN' => getenv('AUTH_TEST_ACCESS_TOKEN'),
+                'X-ACCESS-CHECK' => getenv('AUTH_TEST_ACCESS_CHECK'),
+            ]
+        ]);
+
+        assert($authResponse->getStatusCode() === 200);
+
+        // Authorization
+        $authToken = $authResponse->getHeader('Authorization');
+
+        self::$authToken = 'Bearer '. $authToken[0];
 
 
         self::$workflowData = [
@@ -36,7 +52,10 @@ class WorkflowTaskTest extends \PHPUnit\Framework\TestCase
         
         // Ensure the workflow name is unique by appending the current timestamp
         $resp = self::$client->post(self::URI_PREFIX . '/workflow', [
-            'json' => self::$workflowData
+            'json' => self::$workflowData,
+            'headers' => [
+                'Authorization' => self::$authToken
+            ]            
         ]);
 
         $responseBody = json_decode($resp->getBody()->getContents(), true);
@@ -58,7 +77,10 @@ class WorkflowTaskTest extends \PHPUnit\Framework\TestCase
 
         // Ensure the task name is unique by appending the current timestamp
         $resp = self::$client->post(self::URI_PREFIX . '/workflow/' . self::$workflowId . '/task', [
-            'json' => self::$taskData
+            'json' => self::$taskData,
+            'headers' => [
+                'Authorization' => self::$authToken
+            ]
         ]);
 
         $this->assertEquals(201, $resp->getStatusCode());

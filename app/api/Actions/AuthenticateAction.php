@@ -9,7 +9,6 @@ use Xavante\API\Services\AuthenticationService;
 class AuthenticateAction extends BaseAction
 {
 
-    public function __construct(private AuthenticationService $authenticationService){}
 
     public function __invoke(Request $request, Response $response, array $args=[])
     {

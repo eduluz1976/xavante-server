@@ -5,12 +5,13 @@ namespace Xavante\API\Actions\Workflow;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Xavante\API\Services\AuthenticationService;
 use Xavante\API\Services\WorkflowService;
 
 class CreateWorkflowAction extends BaseWorkflowAction
 {
 
-    public function __construct(private WorkflowService $workflowService){}
+    // public function __construct(protected WorkflowService $workflowService, protected AuthenticationService $authenticationService){}
 
 
     public function __invoke(Request $request, Response $response, array $args = [])
