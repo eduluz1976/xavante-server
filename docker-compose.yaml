@@ -6,6 +6,8 @@ services:
             context: .docker/redis
             dockerfile: Dockerfile
         restart: always
+        volumes:
+            - ".var/db_redis:/data/db"
 
 
     app:
@@ -34,8 +36,22 @@ services:
             MONGO_INITDB_HOST: ${DB_HOST}
             MONGO_INITDB_DATABASE: ${DB_NAME}
         volumes:
-            - "./.var/db_data:/data/db"
+            - ".var/db_data:/data/db"
         
 
+
+    ingress:
+        build:
+            context: .docker/ingress
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - .docker/ingress/conf.d:/etc/nginx/conf.d
+            - .var/certs:/etc/nginx/certs
+        depends_on:
+            - app
 
 
