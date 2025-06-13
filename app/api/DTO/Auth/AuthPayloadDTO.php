@@ -1,8 +1,9 @@
 <?php
+
 namespace Xavante\API\DTO\Auth;
 
-class AuthPayloadDTO {
-
+class AuthPayloadDTO
+{
     public string $clientId;
 
     public string $timestamp;

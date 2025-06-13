@@ -51,4 +51,3 @@ class WorkflowTaskDTO extends BaseDTO
     }
 
 }
-

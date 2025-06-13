@@ -2,6 +2,6 @@
 
 namespace Xavante\API\Hydrators;
 
-
-class Workflow {}
-
+class Workflow
+{
+}

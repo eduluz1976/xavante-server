@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Xavante\API\DTO\Workflow;
 
 use Symfony\Component\Validator\Constraints as Assert;

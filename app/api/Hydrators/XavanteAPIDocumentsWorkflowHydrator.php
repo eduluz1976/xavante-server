@@ -17,7 +17,9 @@ use function is_array;
  */
 class XavanteAPIDocumentsWorkflowHydrator implements HydratorInterface
 {
-    public function __construct(private DocumentManager $dm, private ClassMetadata $class) {}
+    public function __construct(private DocumentManager $dm, private ClassMetadata $class)
+    {
+    }
 
     public function hydrate(object $document, array $data, array $hints = []): array
     {
@@ -52,7 +54,11 @@ class XavanteAPIDocumentsWorkflowHydrator implements HydratorInterface
         // Field(type: "date")
         if (isset($data['createdAt'])) {
             $value = $data['createdAt'];
-            if ($value === null) { $return = null; } else { $return = \Doctrine\ODM\MongoDB\Types\DateType::getDateTime($value); }
+            if ($value === null) {
+                $return = null;
+            } else {
+                $return = \Doctrine\ODM\MongoDB\Types\DateType::getDateTime($value);
+            }
             $this->class->reflFields['createdAt']->setValue($document, clone $return);
             $hydratedData['createdAt'] = $return;
         }
@@ -60,7 +66,11 @@ class XavanteAPIDocumentsWorkflowHydrator implements HydratorInterface
         // Field(type: "date")
         if (isset($data['updatedAt'])) {
             $value = $data['updatedAt'];
-            if ($value === null) { $return = null; } else { $return = \Doctrine\ODM\MongoDB\Types\DateType::getDateTime($value); }
+            if ($value === null) {
+                $return = null;
+            } else {
+                $return = \Doctrine\ODM\MongoDB\Types\DateType::getDateTime($value);
+            }
             $this->class->reflFields['updatedAt']->setValue($document, clone $return);
             $hydratedData['updatedAt'] = $return;
         }

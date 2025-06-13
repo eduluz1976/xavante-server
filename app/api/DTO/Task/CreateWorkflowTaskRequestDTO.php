@@ -2,7 +2,6 @@
 
 namespace Xavante\API\DTO\Task;
 
-
 use Symfony\Component\Validator\Constraints as Assert;
 use Xavante\API\DTO\BaseDTO;
 

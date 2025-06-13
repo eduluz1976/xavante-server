@@ -6,10 +6,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Xavante\API\Services\WorkflowService;
 
-
 class DeleteWorkflowAction extends BaseWorkflowAction
 {
-
     // public function __construct(private WorkflowService $workflowService){}
 
 

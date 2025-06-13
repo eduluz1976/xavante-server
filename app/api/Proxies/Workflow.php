@@ -2,5 +2,6 @@
 
 namespace Xavante\API\Proxies;
 
-
-class Workflow {}
+class Workflow
+{
+}

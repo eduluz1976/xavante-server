@@ -2,12 +2,13 @@
 
 namespace Xavante\API\Services;
 
-class ConfigurationService {
-
+class ConfigurationService
+{
     protected array $data = [];
 
 
-    public function get(string $key, mixed $default=null) : mixed{
+    public function get(string $key, mixed $default = null): mixed
+    {
 
         $configValue = getenv($key);
         if ($configValue !== null) {
@@ -16,11 +17,13 @@ class ConfigurationService {
         return $default;
     }
 
-    public function setData($key, $value) {
+    public function setData($key, $value)
+    {
         $this->data[$key] = $value;
     }
 
-    public function getData($key, $default=null) {
+    public function getData($key, $default = null)
+    {
         return $this->data[$key] ?? $default;
     }
 

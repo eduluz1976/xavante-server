@@ -8,9 +8,8 @@ use Xavante\API\Documents\Workflow;
 use Xavante\API\DTO\Workflow\WorkflowDTO;
 use Xavante\API\Factories\WorkflowFactory;
 
-class WorkflowService {
-
-
+class WorkflowService
+{
     public function __construct(
         private \Xavante\API\Repositories\RepositoryInterface $repository
     ) {

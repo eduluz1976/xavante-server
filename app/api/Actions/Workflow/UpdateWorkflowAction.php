@@ -6,10 +6,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Xavante\API\DTO\Workflow\UpdateWorkflowRequestDTO;
 
-
 class UpdateWorkflowAction extends BaseWorkflowAction
 {
-
     public function __invoke(Request $request, Response $response, array $args = [])
     {
 

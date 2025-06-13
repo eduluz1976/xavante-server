@@ -7,10 +7,8 @@ use Xavante\API\DTO\Task\WorkflowTaskDTO;
 use Xavante\API\Factories\WorkflowFactory;
 use Xavante\API\Factories\WorkflowTaskFactory;
 
-
-class WorkflowTaskService {
-
-
+class WorkflowTaskService
+{
     public function __construct(
         private \Xavante\API\Repositories\RepositoryInterface $repository,
         private \Xavante\API\Services\WorkflowService $workflowService
@@ -51,7 +49,7 @@ class WorkflowTaskService {
         // Assuming the Workflow document has a method to add tasks
         $workflowDocument->addTask($workflowTask);
 
-      
+
         // Step 4: Save the updated workflow document using the repository
         $documentResult = $this->repository->save($workflowDocument);
 

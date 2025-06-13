@@ -9,8 +9,6 @@ use Xavante\API\DTO\Workflow\WorkflowDTO;
 
 class ListWorkflowsAction extends BaseWorkflowAction
 {
-
-
     public function __invoke(Request $request, Response $response, array $args = [])
     {
 
@@ -30,7 +28,7 @@ class ListWorkflowsAction extends BaseWorkflowAction
 
         $data = [
             'count' => count($rows),
-            'rows'=> $rows,            
+            'rows' => $rows,
         ];
 
         return $this->jsonResponse($response, $data, 200);

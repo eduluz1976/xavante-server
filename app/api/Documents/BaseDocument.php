@@ -1,11 +1,11 @@
 <?php
 
 namespace Xavante\API\Documents;
+
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 abstract class BaseDocument implements \JsonSerializable
 {
-
     #[ODM\Id]
     public ?string $id;
 

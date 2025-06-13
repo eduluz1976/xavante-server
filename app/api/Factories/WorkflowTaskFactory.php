@@ -5,12 +5,12 @@ namespace Xavante\API\Factories;
 use Xavante\API\DTO\Workflow\UpdateWorkflowRequestDTO;
 use Xavante\API\DTO\Task\CreateWorkflowTaskRequestDTO;
 use Xavante\API\Documents\WorkflowTask as WorkflowTaskDocument;
-use \Xavante\API\Documents\Workflow as WorkflowDocument;
+use Xavante\API\Documents\Workflow as WorkflowDocument;
 use Xavante\API\DTO\Workflow\WorkflowDTO;
 use Kodus\Helpers\UUID;
 
-
-class WorkflowTaskFactory {
+class WorkflowTaskFactory
+{
     /**
      * Create a new workflow task from the given data.
      *
@@ -20,7 +20,7 @@ class WorkflowTaskFactory {
     public static function createDocumentFromRequestDTO(CreateWorkflowTaskRequestDTO $dto): WorkflowTaskDocument
     {
         $dto = new WorkflowTaskDocument($dto->jsonSerialize());
-        
+
 
         // generate uuid from php native function
         $dto->id = UUID::create();
