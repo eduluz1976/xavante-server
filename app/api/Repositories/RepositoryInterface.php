@@ -2,13 +2,10 @@
 
 namespace Xavante\API\Repositories;
 
-
 use Xavante\API\Documents\BaseDocument;
 
 interface RepositoryInterface
 {
-
-    // public function __construct(protected \Doctrine\ODM\MongoDB\DocumentManager $documentManager) {}    
 
     /**
      * Find a document by its ID.
@@ -16,7 +13,7 @@ interface RepositoryInterface
      * @param string $id
      * @return mixed
      */
-    public function findById(string $id, string $documentClassName) : ?BaseDocument;
+    public function findById(string $id, string $documentClassName): ?BaseDocument;
 
     /**
      * Save a document.
