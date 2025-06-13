@@ -7,24 +7,30 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Message\ResponseInterface as Response;
 use RuntimeException;
+use Xavante\API\Helpers\AuthHelper;
 use Xavante\API\Repositories\Redis;
 use Xavante\API\Services\AuthenticationService;
+use Xavante\API\Services\ConfigurationService;
 use Xavante\API\Services\UserService;
 
-class AuthenticateMiddleware
+class AuthorizeAdminsOnlyMiddleware
 {
+    use AuthHelper;
+
     protected AuthenticationService $authenticationService;
     protected ResponseFactoryInterface $responseFactory;
     protected Redis $redis;
     protected UserService $userService;
+    protected ConfigurationService $config;
 
 
-    public function __construct($container, ...$args)
+    public function __construct($container)
     {
         $this->authenticationService = $container->get(AuthenticationService::class);
         $this->responseFactory = $container->get(ResponseFactoryInterface::class);
         $this->redis = $container->get(Redis::class);
         $this->userService = $container->get(UserService::class);
+        $this->config = $container->get(ConfigurationService::class);
     }
 
 
@@ -41,10 +47,13 @@ class AuthenticateMiddleware
     {
 
         try {
-            $this->authenticate($request);
+            $this->authorize($request);
         } catch (RuntimeException $ex) {
             $response = $this->responseFactory->createResponse(403, 'Forbidden');
-            $response->getBody()->write('Error: ' . $ex->getMessage());
+            $json = ['message' => 'Error: ' . $ex->getMessage()];
+            $response->getBody()->write(json_encode($json));
+            $response = $response->withStatus(403);
+            $response = $response->withAddedHeader('Content-Type', 'application/json');
             return $response;
         }
 
@@ -53,21 +62,27 @@ class AuthenticateMiddleware
 
 
 
-    protected function authenticate(Request $request)
+    protected function authorize(Request $request)
     {
-        $authorizationHeader = $request->getHeader('Authorization');
-        if (empty($authorizationHeader)) {
-            throw new RuntimeException("Auth token is not present");
+
+
+        $permissions = $this->config->getData('CLIENT_PERMISSIONS') ?? [];
+
+        // print_r($permissions); exit;
+        $isAuthorized = false;
+
+        foreach ($permissions as $permission) {
+            if (!isset($permission['role'])) {
+                continue;
+            }
+            if (strtolower($permission['role']) === 'admin') {
+                $isAuthorized = true;
+            }
         }
 
-        $authorizationHeader = (string) $authorizationHeader[0];
-
-        if (strlen($authorizationHeader) < 10) {
-            throw new RuntimeException("Invalid auth token");
+        if (!$isAuthorized) {
+            throw new RuntimeException("User not authorized");
         }
-
-        $token = substr($authorizationHeader, 7);
-        $this->authenticationService->verifyAuthToken($token);
     }
 
 }

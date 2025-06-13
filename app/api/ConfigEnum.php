@@ -13,6 +13,9 @@ class ConfigEnum
     public const CONFIG_QUEUE_REDIS_HOST = 'QUEUE_REDIS_HOST';
     public const CONFIG_QUEUE_CHANNEL_NAME = 'QUEUE_CHANNEL_NAME';
 
+    public const CONFIG_CACHE_REDIS_HOST = 'REDIS_HOST';
+    public const CONFIG_CACHE_REDIS_PORT = 'REDIS_PORT';
+
     public const CONFIG_DB_URI = 'DB_URI';
     public const CONFIG_DB_DRIVER = 'DB_DRIVER';
 }

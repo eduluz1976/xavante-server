@@ -2,7 +2,6 @@
 
 namespace Xavante\API\DTO;
 
-
 class BaseDTO implements \JsonSerializable
 {
     /**

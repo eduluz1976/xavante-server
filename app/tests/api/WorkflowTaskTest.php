@@ -4,11 +4,9 @@ namespace tests\api;
 
 use GuzzleHttp\Client;
 
-
 class WorkflowTaskTest extends \PHPUnit\Framework\TestCase
 {
-
-    const URI_PREFIX = '/api/v1';
+    public const URI_PREFIX = '/api/v1';
 
     protected static $client;
     protected static $baseUri = 'http://app:8080';
@@ -28,10 +26,10 @@ class WorkflowTaskTest extends \PHPUnit\Framework\TestCase
         ]);
 
         // Authenticate
-        $authResponse = self::$client->post(self::URI_PREFIX.'/auth',[
+        $authResponse = self::$client->post(self::URI_PREFIX.'/auth', [
             'headers' => [
-                'X-ACCESS-TOKEN' => getenv('AUTH_TEST_ACCESS_TOKEN'),
-                'X-ACCESS-CHECK' => getenv('AUTH_TEST_ACCESS_CHECK'),
+                'X-ACCESS-TOKEN' => getenv('AUTH_TEST_ADMIN_ACCESS_TOKEN'),
+                'X-ACCESS-CHECK' => getenv('AUTH_TEST_ADMIN_ACCESS_CHECK'),
             ]
         ]);
 
@@ -49,13 +47,13 @@ class WorkflowTaskTest extends \PHPUnit\Framework\TestCase
             'ownerId' => 'test_owner_id'
         ];
 
-        
+
         // Ensure the workflow name is unique by appending the current timestamp
         $resp = self::$client->post(self::URI_PREFIX . '/workflow', [
             'json' => self::$workflowData,
             'headers' => [
                 'Authorization' => self::$authToken
-            ]            
+            ]
         ]);
 
         $responseBody = json_decode($resp->getBody()->getContents(), true);
@@ -87,7 +85,7 @@ class WorkflowTaskTest extends \PHPUnit\Framework\TestCase
         $responseBody = json_decode($resp->getBody()->getContents(), true);
 
         $this->assertArrayHasKey('id', $responseBody);
-        self::$taskId = $responseBody['id'];        
+        self::$taskId = $responseBody['id'];
     }
 
 

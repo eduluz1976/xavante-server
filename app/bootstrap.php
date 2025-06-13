@@ -8,15 +8,17 @@ use GuzzleHttp\Psr7\Response;
 use MongoDB\Client;
 use Psr\Container\ContainerInterface;
 use Xavante\API\Repositories\RepositoryInterface;
-use \Xavante\API\Repositories\Mongo;
-use \Predis\Client as PredisClient;
+use Xavante\API\Repositories\Mongo;
+use Predis\Client as PredisClient;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Xavante\API\Middleware\AuthenticateMiddleware;
 use Xavante\API\Services\AuthenticationService;
 use Xavante\API\Services\ConfigurationService;
 use Xavante\API\Services\WorkflowService;
 use Slim\Psr7\Factory\ResponseFactory;
-
+use Xavante\API\Middleware\AuthorizeAdminsOnlyMiddleware;
+use Xavante\API\Repositories\Redis;
+use Xavante\API\Services\UserService;
 
 $containerBuilder = new ContainerBuilder();
 $containerBuilder->addDefinitions(__DIR__ . '/etc/db.php');
@@ -24,14 +26,15 @@ $containerBuilder->addDefinitions(__DIR__ . '/etc/db.php');
 $containerBuilder->addDefinitions([
     RepositoryInterface::class => \DI\autowire(Mongo::class)
         ->constructorParameter('documentManager', \DI\get(DocumentManager::class)),
-]); 
+]);
 
 
 $container = $containerBuilder->build();
 
 
 $container->set(
-    DocumentManager::class, static function (ContainerInterface $container): DocumentManager {
+    DocumentManager::class,
+    static function (ContainerInterface $container): DocumentManager {
 
         $settings = $container->get('settings')['doctrine']['connection'];
 
@@ -56,52 +59,77 @@ $container->set(
 
         return $documentManager;
     }
-    
 );
 
 
-$container->set(ConfigurationService::class, static function(ContainerInterface $container): ConfigurationService {
-        return new ConfigurationService();
-    });
+$container->set(ConfigurationService::class, static function (ContainerInterface $container): ConfigurationService {
+    return new ConfigurationService();
+});
 
 
-$container->set(WorkflowService::class, static function(ContainerInterface $container): WorkflowService {
-        $repository = $container->get(RepositoryInterface::class);
-        return new WorkflowService($repository);
-    });
+$container->set(WorkflowService::class, static function (ContainerInterface $container): WorkflowService {
+    $repository = $container->get(RepositoryInterface::class);
+    return new WorkflowService($repository);
+});
 
 
-$container->set(AuthenticationService::class, static function(ContainerInterface $container): AuthenticationService {
-        $repository = $container->get(RepositoryInterface::class);
-        $config = $container->get(ConfigurationService::class);
-        return new AuthenticationService(repository: $repository, config: $config);
-    });
-
-    
+$container->set(UserService::class, static function (ContainerInterface $container): UserService {
+    $repository = $container->get(RepositoryInterface::class);
+    return new UserService($repository);
+});
 
 
+$container->set(AuthenticationService::class, static function (ContainerInterface $container): AuthenticationService {
+    $repository = $container->get(RepositoryInterface::class);
+    $config = $container->get(ConfigurationService::class);
+    $redis = $container->get(Redis::class);
+    $userService = $container->get(UserService::class);
+    return new AuthenticationService(
+        repository: $repository,
+        config: $config,
+        redis: $redis,
+        userService: $userService
+    );
+});
 
 
 
-$container->set(ResponseFactoryInterface::class, static function(ContainerInterface $container): ResponseFactoryInterface {
-        // return $container->get(ResponseFactory)
-        return $container->get(ResponseFactory::class);
-    });
 
 
-$container->set(AuthenticateMiddleware::class, static function(ContainerInterface $container): AuthenticateMiddleware {
-        return new AuthenticateMiddleware($container);
-    });
+
+
+$container->set(ResponseFactoryInterface::class, static function (ContainerInterface $container): ResponseFactoryInterface {
+    // return $container->get(ResponseFactory)
+    return $container->get(ResponseFactory::class);
+});
+
+
+$container->set(AuthenticateMiddleware::class, static function (ContainerInterface $container): AuthenticateMiddleware {
+    return new AuthenticateMiddleware($container);
+});
+
+
+$container->set(AuthorizeAdminsOnlyMiddleware::class, static function (ContainerInterface $container): AuthorizeAdminsOnlyMiddleware {
+    return new AuthorizeAdminsOnlyMiddleware($container);
+});
+
+
+
+
+
+$container->set(Redis::class, static function (ContainerInterface $container): Redis {
+    return new Redis(host: getenv(ConfigEnum::CONFIG_CACHE_REDIS_HOST) ?? 'redis');
+});
 
 
 $container->set(PredisClient::class, static function (ContainerInterface $container): PredisClient {
-        return new PredisClient([
-            'scheme' => 'tcp',
-            'host' => getenv(ConfigEnum::CONFIG_QUEUE_REDIS_HOST) ?? 'redis',
-            'port' => 6379,
-            'database' => 0,
-            'read_write_timeout' => 0,
-        ]);
-    });
+    return new PredisClient([
+        'scheme' => 'tcp',
+        'host' => getenv(ConfigEnum::CONFIG_QUEUE_REDIS_HOST) ?? 'redis',
+        'port' => 6379,
+        'database' => 0,
+        'read_write_timeout' => 0,
+    ]);
+});
 
 return $container;

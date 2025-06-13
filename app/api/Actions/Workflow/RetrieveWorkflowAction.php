@@ -8,9 +8,8 @@ use Xavante\API\DTO\Workflow\WorkflowDTO;
 
 class RetrieveWorkflowAction extends BaseWorkflowAction
 {
-
     public function __invoke(Request $request, Response $response, array $args = [])
-    {        
+    {
 
         $workflowId = $args['id'] ?? null;
         if (!$workflowId) {
@@ -28,10 +27,11 @@ class RetrieveWorkflowAction extends BaseWorkflowAction
         return $this->jsonResponse($response, (array) $workflow, 200);
     }
 
-    protected function verifyOwnership(WorkflowDTO $workflow) {
-       if ($this->config->getData('CUSTOMER_ID') !==  $workflow->ownerId) {
+    protected function verifyOwnership(WorkflowDTO $workflow)
+    {
+        if ($this->config->getData('CLIENT_ID') !==  $workflow->ownerId) {
             throw new \Exception('This workflow does not belongs to you');
-       }
+        }
     }
 
 }

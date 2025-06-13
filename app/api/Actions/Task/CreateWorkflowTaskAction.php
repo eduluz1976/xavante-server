@@ -9,7 +9,7 @@ class CreateWorkflowTaskAction extends BaseWorkflowTask
 {
     public function __invoke(Request $request, Response $response, array $args = [])
     {
-      
+
 
         $data = $this->getData($request);
 
@@ -30,7 +30,7 @@ class CreateWorkflowTaskAction extends BaseWorkflowTask
             return $this->jsonResponse($response, ['error' => 'Workflow creation failed: ' . $e->getMessage()], 500);
         } catch (\Exception $e) {
             return $this->jsonResponse($response, ['error' => 'Failed to create workflow: ' . $e->getMessage()], 500);
-        }        
+        }
 
         return $this->jsonResponse($response, ['id' => $createdWorkflowTask->id], 201);
     }

@@ -2,9 +2,9 @@
 
 namespace tests\unit;
 
-use \Xavante\API\DTO\Workflow\CreateWorkflowRequest;
+use Xavante\API\DTO\Workflow\CreateWorkflowRequest;
 use Xavante\API\DTO\Workflow\CreateWorkflowRequestDTO;
-use \Xavante\API\DTO\Workflow\ItemWorkflow;
+use Xavante\API\DTO\Workflow\ItemWorkflow;
 use Xavante\API\DTO\Workflow\WorkflowDTO;
 
 class WorkflowTest extends \PHPUnit\Framework\TestCase

@@ -4,11 +4,9 @@ namespace tests\api;
 
 use GuzzleHttp\Client;
 
-
 class WorkflowTest extends \PHPUnit\Framework\TestCase
 {
-
-    const URI_PREFIX = '/api/v1';
+    public const URI_PREFIX = '/api/v1';
 
     protected static $client;
     protected static $baseUri = 'http://app:8080';
@@ -16,7 +14,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     protected static $workflowData;
     protected static $countRows = 0;
     protected static $authToken;
-    
+
 
     public static function setUpBeforeClass(): void
     {
@@ -28,10 +26,10 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         ]);
 
         // Authenticate
-        $authResponse = self::$client->post(self::URI_PREFIX.'/auth',[
+        $authResponse = self::$client->post(self::URI_PREFIX.'/auth', [
             'headers' => [
-                'X-ACCESS-TOKEN' => getenv('AUTH_TEST_ACCESS_TOKEN'),
-                'X-ACCESS-CHECK' => getenv('AUTH_TEST_ACCESS_CHECK'),
+                'X-ACCESS-TOKEN' => getenv('AUTH_TEST_ADMIN_ACCESS_TOKEN'),
+                'X-ACCESS-CHECK' => getenv('AUTH_TEST_ADMIN_ACCESS_CHECK'),
             ]
         ]);
 
@@ -44,6 +42,25 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     }
 
+    public function testCreateWorkflowUnauthenticatedMustFail(): void
+    {
+
+        self::$workflowData = [
+            'name' => 'Test Workflow ' . time(),
+            'description' => 'This is a test workflow.',
+            'ownerId' => 'test_owner_id'
+        ];
+
+
+        // Ensure the workflow name is unique by appending the current timestamp
+        $resp = self::$client->post($this->getWorkflowBaseURI(), [
+            'json' => self::$workflowData
+        ]);
+
+        $this->assertEquals(403, $resp->getStatusCode());
+        $responseBody = json_decode($resp->getBody()->getContents(), true);
+    }
+
     public function testCreateWorkflow(): void
     {
 
@@ -53,7 +70,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
             'ownerId' => 'test_owner_id'
         ];
 
-        
+
         // Ensure the workflow name is unique by appending the current timestamp
         $resp = self::$client->post($this->getWorkflowBaseURI(), [
             'json' => self::$workflowData,
@@ -76,12 +93,14 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetWorkflow(): void
     {
-        $resp = self::$client->get($this->getWorkflowURIWithId(),[
+        $resp = self::$client->get(
+            $this->getWorkflowURIWithId(),
+            [
         'headers' => [
                 'Authorization' => self::$authToken
             ]
         ]
-    );
+        );
 
         $this->assertEquals(200, $resp->getStatusCode());
         $responseBody = json_decode($resp->getBody()->getContents(), true);
@@ -121,13 +140,15 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($updatedData['description'], $responseBody['description']);
     }
 
-    protected function getWorkflowURIWithId() {
-        return sprintf("%s/workflow/%s",self::URI_PREFIX,self::$workflowId);
+    protected function getWorkflowURIWithId()
+    {
+        return sprintf("%s/workflow/%s", self::URI_PREFIX, self::$workflowId);
     }
 
 
-    protected function getWorkflowBaseURI() {
-        return sprintf("%s/workflow",self::URI_PREFIX);
+    protected function getWorkflowBaseURI()
+    {
+        return sprintf("%s/workflow", self::URI_PREFIX);
     }
 
     /**
@@ -135,12 +156,14 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      */
     public function testListAllWorkflows(): void
     {
-        $resp = self::$client->get(self::URI_PREFIX . '/workflow',[
+        $resp = self::$client->get(
+            self::URI_PREFIX . '/workflow',
+            [
             'headers' => [
                 'Authorization' => self::$authToken
             ]
         ]
-    );
+        );
 
         $this->assertEquals(200, $resp->getStatusCode());
         $responseBody = json_decode($resp->getBody()->getContents(), true);
@@ -168,7 +191,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteWorkflow(): void
     {
-        $resp = self::$client->delete(self::URI_PREFIX . '/workflow/' . self::$workflowId,[
+        $resp = self::$client->delete(self::URI_PREFIX . '/workflow/' . self::$workflowId, [
             'headers' => [
                 'Authorization' => self::$authToken
             ]
@@ -180,7 +203,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('id', $responseBody);
         $this->assertEquals(self::$workflowId, $responseBody['id']);
 
-        $respGetWorkflows = self::$client->get(self::URI_PREFIX . '/workflow',[
+        $respGetWorkflows = self::$client->get(self::URI_PREFIX . '/workflow', [
             'headers' => [
                 'Authorization' => self::$authToken
             ]
@@ -193,12 +216,144 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($responseBody);
 
         $this->assertArrayHasKey('count', $responseBody);
-        $this->assertEquals(self::$countRows-1, $responseBody['count']);
+        $this->assertEquals(self::$countRows - 1, $responseBody['count']);
         $this->assertArrayHasKey('rows', $responseBody);
-        $this->assertCount(self::$countRows-1, $responseBody['rows']);
+        $this->assertCount(self::$countRows - 1, $responseBody['rows']);
 
     }
-    
+
+
+
+    /**
+     * @depends testGetWorkflow
+     */
+    public function testSecondUserOperations()
+    {
+
+        $client = new Client([
+            'base_uri' => 'http://app:8080',
+            'http_errors' => false,
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+
+
+        $payload = [
+            'headers' => [
+                'X-ACCESS-TOKEN' => getenv('AUTH_TEST_ADMIN_ACCESS_TOKEN'),
+                'X-ACCESS-CHECK' => getenv('AUTH_TEST_ADMIN_ACCESS_CHECK'),
+            ]
+            ];
+
+        // Authenticate
+        $authResponse = $client->post('/api/v1/auth', $payload);
+
+        $authResponseJson = json_decode($authResponse->getBody()->getContents(), true);
+
+        assert(is_array($authResponseJson));
+        assert(array_key_exists('status', $authResponseJson));
+        assert($authResponseJson['status'] === 'success');
+
+
+        assert($authResponse->getStatusCode() === 200);
+
+
+        $authorizationHeader = $authResponse->getHeader('Authorization');
+
+
+        $authToken = 'Bearer '. $authorizationHeader[0];
+
+        $payload = [
+            'json' => [
+                'name' => 'My API test user'
+            ],
+            'headers' => [
+                'Authorization' => $authToken
+            ]
+        ];
+
+
+        $userCreationResponse = $client->post('/api/v1/user', $payload);
+
+        $userCreationResponseData = json_decode($userCreationResponse->getBody()->getContents(), true);
+
+
+        $this->assertEquals(201, $userCreationResponse->getStatusCode());
+
+
+        $newClientCredentialsResponse = $client->post('/api/v1/auth/credentials', [
+            'json' => [
+                'secret' => $userCreationResponseData['secret'],
+                'client_id' => $userCreationResponseData['client_id'],
+            ]
+        ]);
+
+        $this->assertEquals(200, $newClientCredentialsResponse->getStatusCode());
+
+
+        $newClientCredentialsData = json_decode($newClientCredentialsResponse->getBody()->getContents(), true);
+
+        $this->assertTrue(is_array($newClientCredentialsData));
+
+
+        $newClientData = array_merge($userCreationResponseData, [
+            'X-ACCESS-TOKEN' => $newClientCredentialsData['X-ACCESS-TOKEN'],
+            'X-ACCESS-CHECK' => $newClientCredentialsData['X-ACCESS-CHECK'],
+        ]);
+
+        $this->verifyGetWorkflowFromOtherClient($newClientData);
+
+
+
+    }
+
+
+    /**
+     * Creating a new `user`, and using it to access the existing workflow should fail.
+     */
+    public function verifyGetWorkflowFromOtherClient($newClientData): void
+    {
+
+
+        $client = new Client([
+            'base_uri' => 'http://app:8080',
+            'http_errors' => false,
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+
+
+        $payload = [
+            'headers' => [
+                'X-ACCESS-TOKEN' => $newClientData['X-ACCESS-TOKEN'],
+                'X-ACCESS-CHECK' => $newClientData['X-ACCESS-CHECK'],
+            ]
+            ];
+
+        // Authenticate
+        $authResponse = $client->post('/api/v1/auth', $payload);
+
+        $authResponseJson = json_decode($authResponse->getBody()->getContents(), true);
+
+        assert(is_array($authResponseJson));
+        assert(array_key_exists('status', $authResponseJson));
+        assert($authResponseJson['status'] === 'success');
+
+        $authToken = $authResponse->getHeader('Authorization');
+
+        $newAuthToken = 'Bearer '. $authToken[0];
+
+
+        $resp = self::$client->get(
+            $this->getWorkflowURIWithId(),
+            [
+        'headers' => [
+                    'Authorization' => $newAuthToken
+                ]
+            ]
+        );
+
+        $this->assertEquals(404, $resp->getStatusCode());
+    }
+
 
 
 }
