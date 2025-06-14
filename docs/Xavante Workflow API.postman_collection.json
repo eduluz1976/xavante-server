@@ -1,0 +1,420 @@
+{
+	"info": {
+		"_postman_id": "ba027777-8c6e-4947-903d-93a9aecd026f",
+		"name": "Xavante Workflow API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5118144",
+		"_collection_link": "https://api-team-0896.postman.co/workspace/Xavante~dbc584b4-2146-40ea-9084-36454415cc88/collection/5118144-ba027777-8c6e-4947-903d-93a9aecd026f?action=share&source=collection_link&creator=5118144"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Create Auth Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"let response = pm.response.json(); // Parse the JSON response",
+									"console.log(response);",
+									"pm.environment.set(\"x-access-admin-token\", response['X-ACCESS-TOKEN']);",
+									"pm.environment.set(\"x-access-admin-check\", response['X-ACCESS-CHECK']);",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"secret\": \"{{admin-secret}}\",\n    \"client_id\": \"{{admin-client_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{app-server}}/api/v1/auth/credentials",
+							"host": [
+								"{{app-server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"credentials"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authorize",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseBody = pm.response.json();",
+									"if (responseBody.status === \"success\" && responseBody.message === \"Authenticated successfully\") {",
+									"    pm.test(\"Authentication successful\", function () {",
+									"        pm.expect(responseBody.status).to.eql(\"success\");",
+									"        pm.expect(responseBody.message).to.eql(\"Authenticated successfully\");",
+									"        pm.collectionVariables.set(\"auth-token\", pm.response.headers.get('Authorization'));",
+									"    });",
+									"",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-ACCESS-TOKEN",
+								"value": "{{x-access-admin-token}}",
+								"type": "text"
+							},
+							{
+								"key": "X-ACCESS-CHECK",
+								"value": "{{x-access-admin-check}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{app-server}}/api/v1/auth",
+							"host": [
+								"{{app-server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth"
+							]
+						},
+						"description": "## Authentication Endpoint\n\nThis endpoint is used to authenticate users by submitting their credentials. Upon successful authentication, the server responds with a status indicating the result of the authentication attempt.\n\n### Request\n\n- **Method**: POST\n    \n- **URL**: `{{app-server}}/api/v1/auth`\n    \n\n#### Headers\n\nThe required headers should include the following values:\n\n- `X-ACCESS-TOKEN` (string): The auth token for that user.\n    \n- `X-ACCESS-CHECK` (string): A string that validates the token's contents plus the `secret` stored server-side.\n    \n\n### Response\n\nUpon successful execution of the request, the server will respond with a JSON object containing the following fields:\n\n- `status` (string): Indicates the success or failure of the authentication process.\n    \n- `message` (string): Provides additional information regarding the authentication status.\n    \n\n### Notes\n\n- Ensure that the credentials provided are correct to receive a successful response.\n    \n- Handle the response appropriately based on the `status` and `message` fields to inform the user of the authentication result.\n    \n- To get the credentials, use the **Create Auth Token** request."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"name-user\", \"New regular user \" + Date().toString()); // Set environment variable",
+									"//.set(\"name-user\", \"New regular user \" + Date().toString());",
+									"//.collectionVariables.set(\"name-user\", \"New regular user \" + Date().toString());",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth-token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{name-user}}\",\n    \"status\": \"active\",\n    \"type\": \"public\",\n    \"permissions\": [\n        {\n            \"role\": \"user\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{app-server}}/api/v1/user",
+							"host": [
+								"{{app-server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user"
+							]
+						},
+						"description": "### Create User Endpoint\n\nThis endpoint allows you to create a new user in the system. It accepts a JSON payload containing user details and returns a response with the newly created user's information.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{app-server}}/api/v1/user`\n    \n- **Content-Type**: application/json\n    \n\n##### Request Body\n\nThe request body must be in JSON format and include the following fields:\n\n- `name` (string): The name of the user to be created.\n    \n- `status` (string): The status of the user (e.g., \"active\").\n    \n- `type` (string): The type of user (e.g., \"public\").\n    \n- `permissions` (array): An array of permission objects. Each object should contain:\n    \n    - `role` (string): The role assigned to the user (e.g., \"user\").\n        \n\n**Example Request Body:**\n\n``` json\n{\n  \"name\": \"{{name-user}}\",\n  \"status\": \"active\",\n  \"type\": \"public\",\n  \"permissions\": [{\"role\": \"user\"}]\n}\n\n ```\n\n#### Response\n\nUpon successful creation of the user, the server responds with:\n\n- **Status Code**: 201 Created\n    \n- **Content-Type**: application/json\n    \n\n##### Response Body\n\nThe response body will be in JSON format and include the following fields:\n\n- `id` (string): The unique identifier for the newly created user.\n    \n- `client_id` (string): The client identifier associated with the user.\n    \n- `secret` (string): The secret key associated with the user.\n    \n\n**Example Response Body:**\n\n``` json\n{\n  \"id\": \"\",\n  \"client_id\": \"\",\n  \"secret\": \"\"\n}\n\n ```\n\nThis endpoint is essential for managing user accounts within the application, enabling the creation of users with specific roles and permissions."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Workflow",
+			"item": [
+				{
+					"name": "Create a new Workflow",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"let workflowId = pm.response.json().id;",
+									"",
+									"",
+									"",
+									"let responseBody = pm.response.json();",
+									"if (pm.response.status == 201) {",
+									"    pm.test(\"Authentication successful\", function () {",
+									"        let workflowId = pm.response.json().id;",
+									"        pm.expect(workflowId.length).to.eql(24);",
+									"        pm.collectionVariables.set(\"workflowId\", workflowId);",
+									"    });",
+									"",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"",
+									"function getWorkflowName() {",
+									"    // generate a random number",
+									"    var randomNum = Math.floor(Math.random() * 1000000); // generates a number between 0 and 999999",
+									"    return \"My Workflow \" + randomNum;",
+									"}",
+									"",
+									"function getWorkflowDescription() {",
+									"    return \"This is a test workflow created on \" + Date();",
+									"}",
+									"",
+									"",
+									"pm.environment.set(\"workflow-name\", getWorkflowName());",
+									"pm.environment.set(\"workflow-description\", getWorkflowDescription());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{workflow-name}}\",\n    \"description\": \"{{workflow-description}}\"\n}"
+						},
+						"url": {
+							"raw": "{{app-server}}/api/v1/workflow",
+							"host": [
+								"{{app-server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workflow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve an Workflow",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{app-server}}/api/v1/workflow/{{workflowId}}",
+							"host": [
+								"{{app-server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workflow",
+								"{{workflowId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve all Workflows",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{app-server}}/api/v1/workflow",
+							"host": [
+								"{{app-server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workflow"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{auth-token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get server status",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"{{name-user}}\",\n    \"status\": \"active\",\n    \"type\": \"public\",\n    \"permissions\": [\n        {\n            \"role\": \"user\"\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{app-server}}/api/v1/status",
+					"host": [
+						"{{app-server}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"status"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "app-server",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "auth-token",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "x-access-token",
+			"value": "eyJjbGllbnRfaWQiOiJoczRhU1hDQ0c3eDRmdlVmXC9RVGp1YXdRVzM3ck5ZZW5mY1Z0OWt6WUwxUDFkWFU9IiwidGltZXN0YW1wIjoxNzQ5NjAwMDMyfQ==",
+			"type": "string"
+		},
+		{
+			"key": "x-access-check",
+			"value": "e019d54c22dfd3151b7a79b719af85edba84605aab07ae444ee6108090bbcd2e",
+			"type": "string"
+		},
+		{
+			"key": "x-access-admin-token",
+			"value": "eyJjbGllbnRfaWQiOiJjRjIyd240QkZLeVZYMDJyZmNHZ3o1MUpWNzE5MkhBRGk1a3N5MHE0T3VwVmRSIiwidGltZXN0YW1wIjoxNzQ5NjIzMTc0fQ==",
+			"type": "string"
+		},
+		{
+			"key": "x-access-admin-check",
+			"value": "e8f7b11cf7c97d411883a4f10e59a837503758aca336bb0b4d30d4208b08f878",
+			"type": "string"
+		},
+		{
+			"key": "admin-secret",
+			"value": "vt/PixzKO9oBFu/77H5uqqUzvN21svQl6KfNjV7re+Rbjz7GAsSBKZMrLQDlhlVigGyoZKh/kzkkBexb1DKEyTbe/fAJ68X602XR8vUIMNx4Cz8DBu16mWM3EHOWJBPi",
+			"type": "string"
+		},
+		{
+			"key": "admin-client_id",
+			"value": "cF22wn4BFKyVX02rfcGgz51JV7192HADi5ksy0q4OupVdR",
+			"type": "string"
+		},
+		{
+			"key": "workflowId",
+			"value": "684cb43e2a19571b640e6d6c",
+			"type": "string"
+		}
+	]
+}
