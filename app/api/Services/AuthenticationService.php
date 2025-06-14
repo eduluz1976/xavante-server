@@ -78,7 +78,12 @@ class AuthenticationService
 
         $clientId = $authData['jti'];
         $cacheKey = $this->getCacheKey($clientId);
-        $userData = $this->redis->client->get($cacheKey);
+        try {
+            $userData = $this->redis->client->get($cacheKey);
+        } catch (\Predis\Response\ServerException $ex) {
+            // TODO add log mechanisms
+        }
+
         if (!$userData) {
             $user = $this->userService->getUserByClientId($clientId);
             if (!$user) {
@@ -91,8 +96,12 @@ class AuthenticationService
 
             $userData = json_encode($userData, true);
 
-            $this->redis->client->set($cacheKey, $userData);
-            $this->redis->client->expire($cacheKey, 60);
+            try {
+                $this->redis->client->set($cacheKey, $userData);
+                $this->redis->client->expire($cacheKey, 60);
+            } catch (\Predis\Response\ServerException $ex) {
+                // TODO add log mechanisms
+            }
         }
 
         $userData = json_decode($userData, true);
@@ -141,12 +150,8 @@ class AuthenticationService
         $jsonPayload = json_decode($decodedPayload, true);
 
         if (empty($jsonPayload) || !isset($jsonPayload['client_id']) || !isset($jsonPayload['timestamp'])) {
-            print_r([
-                'payload' => $payload,
-                'decodedPayload' => $decodedPayload,
-                'jsonPayload' => $jsonPayload
-            ]);
-            exit;
+            // TODO: add logs
+            throw new \RuntimeException("Error extracting auth payload");
         }
 
         return [
