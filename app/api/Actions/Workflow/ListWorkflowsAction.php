@@ -12,7 +12,10 @@ class ListWorkflowsAction extends BaseWorkflowAction
     public function __invoke(Request $request, Response $response, array $args = [])
     {
 
-        $filters = [];
+        $filters = [
+            'ownerId' => $this->config->getData('CLIENT_ID')
+        ];
+        
 
         try {
             $workflows = $this->workflowService->findAllWorkflows($filters);
