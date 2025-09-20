@@ -2,3 +2,8 @@ vendor/
 .env
 .var/
 .php-cs-fixer.cache
+node_modules/
+.DS_Store
+.idea/
+.vscode/
+*.log
