@@ -25,18 +25,25 @@ class AuthenticationTest extends \PHPUnit\Framework\TestCase
             'headers' => ['Accept' => 'application/json'],
         ]);
 
-        // Authenticate
-        $authResponse = self::$client->post(self::URI_PREFIX.'/auth', [
+
+        $payload = [
             'headers' => [
                 'X-ACCESS-TOKEN' => getenv('AUTH_TEST_ADMIN_ACCESS_TOKEN'),
                 'X-ACCESS-CHECK' => getenv('AUTH_TEST_ADMIN_ACCESS_CHECK'),
             ]
-        ]);
+            ];
+        // Authenticate
+        $authResponse = self::$client->post(self::URI_PREFIX.'/auth', $payload);
 
         assert($authResponse->getStatusCode() === 200);
 
         // Authorization
         $authToken = $authResponse->getHeader('Authorization');
+        $authResponseBody = (string) $authResponse->getBody();
+        $authResponseData = json_decode($authResponseBody, true);
+        print_r($payload);
+        echo "Auth Response: " . $authResponseBody . "\n";exit;
+        
 
         self::$authToken = 'Bearer '. $authToken[0];
     }
