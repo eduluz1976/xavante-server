@@ -37,22 +37,25 @@ class AuthenticationService
 
         $userDocuments = $this->repository->findAll(\Xavante\API\Documents\User::class, ['client_id' => $payloadData['client_id']]);
         if (empty($userDocuments)) {
-            throw new \RuntimeException("Invalid auth token and/or check");
+            throw new \RuntimeException("Invalid auth token and/or check ");
         }
         $userDocument = $userDocuments[0];
 
 
-        $intermediateKey = $this->getIntermediaryKey($userDocument->client_id, $userDocument->hashed_secret);
+        $hashSecret = $userDocument->hashed_secret;
 
-        $jsonPayload = base64_decode($token);
 
-        $expectedToken = hash_hmac('sha256', $jsonPayload, $intermediateKey);
+        $intermediateKey = $this->getIntermediaryKey($userDocument->client_id, $hashSecret);
+
+        $jsonPayload = base64_decode($token, true);
+
+        $expectedToken = $this->signJsonPayload($jsonPayload, $intermediateKey);
 
 
         $isValidSignature = hash_equals($expectedToken, $check);
 
         if (!$isValidSignature) {
-            throw new \RuntimeException("Invalid auth token and/or check");
+            throw new \RuntimeException("Invalid auth token and/or check ");
         }
 
         return $this->createAuthToken($payloadData['client_id']);

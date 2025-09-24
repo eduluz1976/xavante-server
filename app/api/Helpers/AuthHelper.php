@@ -16,4 +16,15 @@ trait AuthHelper
     }
 
 
+    protected function getHashedSecret($secret): string
+    {
+        return hash('sha256', $secret);
+    }
+
+    protected function signJsonPayload(string $jsonPayload, string $intermediaryKey): string
+    {
+        return hash_hmac('sha256', $jsonPayload, $intermediaryKey);
+    }
+
+
 }

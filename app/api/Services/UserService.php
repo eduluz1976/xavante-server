@@ -11,6 +11,7 @@ use Xavante\API\DTO\User\UserDTO;
 use Xavante\API\DTO\Workflow\WorkflowDTO;
 use Xavante\API\Factories\UserFactory;
 use Xavante\API\Factories\WorkflowFactory;
+use Ramsey\Uuid\Uuid;
 
 class UserService
 {
@@ -28,7 +29,7 @@ class UserService
 
         $user->client_id = $this->createClientID();
         $secret = $this->createSecret();
-        $user->hashed_secret = $this->hashSecret($user->client_id, $secret);
+        $user->hashed_secret = $this->hashSecret($secret);
 
         $documentResult = $this->repository->save($user);
 
@@ -45,19 +46,27 @@ class UserService
 
     protected function createClientID(): string
     {
-        $seed = random_bytes(50);
-        $b64Encoded = base64_encode($seed);
-        return substr($b64Encoded, -48);
+        return Uuid::uuid7()->toString();
     }
 
     protected function createSecret(): string
     {
-        $seed = random_bytes(150);
-        $b64Encoded = base64_encode($seed);
-        return substr($b64Encoded, -128);
+        return $this->createRandomString(64);
     }
 
-    protected function hashSecret($clientId, $secret)
+
+    /**
+     * I want to generate a random string with 64 characters, but only alphanumeric characters (a-z, A-Z, 0-9)
+     */
+    protected function createRandomString(int $length): string
+    {
+        $bytes = random_bytes(48);
+        $hash = hash('sha512', $bytes);
+        $b64Encoded = base64_encode($hash);
+        return substr($b64Encoded, 0, $length);
+    }
+
+    protected function hashSecret($secret)
     {
         return hash('sha256', $secret);
     }
@@ -68,7 +77,6 @@ class UserService
     {
         $usersFound = $this->repository->findAll(User::class, ['client_id' => $clientId]);
         if ($usersFound) {
-            // return $usersFound[0];
             $userDTO = new UserDTO($usersFound[0]->jsonSerialize());
             return $userDTO;
         }
