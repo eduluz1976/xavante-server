@@ -4,42 +4,17 @@ namespace tests\api;
 
 use GuzzleHttp\Client;
 
-class WorkflowTest extends \PHPUnit\Framework\TestCase
+class WorkflowTest extends BaseApiTestCase
 {
-    public const URI_PREFIX = '/api/v1';
 
-    protected static $client;
-    protected static $baseUri = 'http://app:8080';
-    protected static $workflowId;
-    protected static $workflowData;
-    protected static $countRows = 0;
-    protected static $authToken;
+    protected static string $workflowId;
+    protected static array $workflowData;
+    protected static int $countRows = 0;
 
 
     public static function setUpBeforeClass(): void
     {
-
-        self::$client = new Client([
-            'base_uri' => self::$baseUri,
-            'http_errors' => false,
-            'headers' => ['Accept' => 'application/json'],
-        ]);
-
-        // Authenticate
-        $authResponse = self::$client->post(self::URI_PREFIX.'/auth', [
-            'headers' => [
-                'X-ACCESS-TOKEN' => getenv('AUTH_TEST_ADMIN_ACCESS_TOKEN'),
-                'X-ACCESS-CHECK' => getenv('AUTH_TEST_ADMIN_ACCESS_CHECK'),
-            ]
-        ]);
-
-        assert($authResponse->getStatusCode() === 200);
-
-        // Authorization
-        $authToken = $authResponse->getHeader('Authorization');
-
-        self::$authToken = 'Bearer '. $authToken[0];
-
+        self::authenticate();
     }
 
     public function testCreateWorkflowUnauthenticatedMustFail(): void
@@ -238,10 +213,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
 
         $payload = [
-            'headers' => [
-                'X-ACCESS-TOKEN' => getenv('AUTH_TEST_ADMIN_ACCESS_TOKEN'),
-                'X-ACCESS-CHECK' => getenv('AUTH_TEST_ADMIN_ACCESS_CHECK'),
-            ]
+            'headers' => self::$creds
             ];
 
         // Authenticate
@@ -264,7 +236,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
         $payload = [
             'json' => [
-                'name' => 'My API test user'
+                'name' => 'My API test user ' . microtime(true),
             ],
             'headers' => [
                 'Authorization' => $authToken
