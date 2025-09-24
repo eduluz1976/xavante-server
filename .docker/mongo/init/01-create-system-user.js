@@ -23,3 +23,9 @@ db2.system_logs.insertOne({
     "resource": "user",
     "timestamp": new Date()
 });
+
+// Create a index on collection 'users' from database 'xavante'
+console.log("Creating index on collection 'users' from database '{MONGO_INITDB_DATABASE}'");
+db2.users.createIndex( { "name": 1 }, { unique: true } );
+
+console.log("MongoDB initialization script completed.");
