@@ -17,7 +17,39 @@ class AuthenticationTest extends BaseApiTestCase
     }
 
 
+    public function testCreateUserUnauthenticatedMustFail(): void
+    {
 
+        $userData = [
+            'name' => 'User Test Workflow ' . time(),
+            'permissions' => [
+                ['role' => 'user']
+            ]
+        ];
+
+        try {
+            // $client = clone self::$client;
+            $client = new \GuzzleHttp\Client([
+                'base_uri' => self::$baseUri,
+                // 'http_errors' => false,
+                'headers' => ['Accept' => 'application/json'],
+            ]);
+            // $client->setDefaultOption('headers', ['Accept' => 'application/json']);
+            $client->post($this->getUserBaseURI(), [
+                'json' => $userData
+            ]);
+            $this->fail( 'Request should have failed due to missing Authorization header');
+
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // Ignore any exceptions related to setting the Authorization header
+            $this->assertEquals(403, $e->getCode());
+            $this->assertStringContainsString('Forbidden', $e->getMessage());
+
+        } catch (\Exception $e) {
+            $this->fail('Unexpected exception: ' . $e->getMessage());
+        }
+
+    }
 
     public function testCreateUser(): void
     {

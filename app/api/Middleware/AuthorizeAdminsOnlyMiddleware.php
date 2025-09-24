@@ -68,7 +68,6 @@ class AuthorizeAdminsOnlyMiddleware
 
         $permissions = $this->config->getData('CLIENT_PERMISSIONS') ?? [];
 
-        // print_r($permissions); exit;
         $isAuthorized = false;
 
         foreach ($permissions as $permission) {
