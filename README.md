@@ -44,11 +44,40 @@ git clone https://github.com/eduluz1976/xavante-server.git
 cd xavante-server
 cp .env.example .env
 docker-compose up --build
-````
+```
 
-The API will be available at: [http://localhost:8080](http://localhost:8080)
+### Create admin user
+
+```bash
+docker compose exec app php scripts/create-admin-user.php
+```
+
+If the user "_cacique_" does not exists, then this is the expected results:
+```
+Admin user created successfully:
+{
+    "id": "68d9d954392d4cb83f0d4051",
+    "name": "_cacique_",
+    "client_id": "019992f8-f3df-7036-8c46-ff2ef54be0e9",
+    "secret": "Y2UwOGE1ZWM1ZDJkOTI2NmQxOGJmMWRhZWIzZjk3MmE5MGNkN2UwOGI1NDkyOGY4",
+    "permissions": [
+        {
+            "role": "admin",
+            "resource": "*"
+        }
+    ]
+}
+```
+
+Otherwise,
+```
+Admin user already exists. No action taken.
+```
+
 
 ### API Example
+
+The API will be available at: [http://localhost:8080](http://localhost:8080)
 
 ```http
 POST /api/v1/workflows/{workflow_id}/start 
@@ -78,6 +107,20 @@ MONGO_AUTH_SOURCE=admin
 DB_UI_EXTERNAL_PORT=<port for my db client - dev env only>
 REDIS_UI_EXTERNAL_PORT=<port for my redis client - dev env only>
 ```
+
+
+## Tests
+
+### Unit tests
+```bash
+docker compose exec app vendor/bin/phpunit tests/unit
+```
+
+### API tests
+```bash
+docker compose exec app vendor/bin/phpunit tests/api
+```
+
 
 ## 📜 License
 

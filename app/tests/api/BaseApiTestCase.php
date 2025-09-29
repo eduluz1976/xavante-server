@@ -80,7 +80,16 @@ class BaseApiTestCase extends \PHPUnit\Framework\TestCase
         // Authorization
         $authToken = $authResponse->getHeader('Authorization');
 
+        assert(!empty($authToken));
+        assert(is_array($authToken), 'Authorization header is missing (0)');
+        assert(count($authToken) === 1, 'Authorization header is missing (1)');
+        assert(array_key_exists(0, $authToken), 'Authorization header is missing (2)');
 
-        self::$authToken = 'Bearer '. $authToken[0];        
-    }    
+        if ((array_key_exists(0, $authToken) === false) || (empty($authToken[0]))) {
+            throw new \Exception('Authorization header is missing (3)');
+        }
+
+
+        self::$authToken = 'Bearer '. $authToken[0];
+    }
 }
